@@ -1,13 +1,32 @@
 I welcome contributors to help with the project.  This project is still in it's early alpha stages, so this would be a great chance to
-get in at near ground floor level and help develop the game to an early release build, beta build and then final build with ongoing patches for improvements, bug fixes, etc.
+get in at near ground floor level and help develop the game to an early release build, beta build and then final build with ongoing 
+patches for improvements, bug fixes, etc.
 
-While I would prefer coders who are passionate about American Football and have a strong knowledge of the game, I understand that this may not realistic, especially when having contributors from other countries.  As such, I strongly encourage anyone who enjoys coding and can help out to participate.  C# coders are encouraged to help as well since VB.net and C# are equivalent languages and as such can fairly easily be converted between the two with minimal difficulties(although I would prefer native VB.net coders, I understand the prevalency of C# coders outnumbers VB.net coders by quite a bit).
+While I would prefer coders who are passionate about American Football and have a strong knowledge of the game, I understand that this 
+may not realistic, especially when having contributors from other countries.  As such, I strongly encourage anyone who enjoys coding
+and can help out to participate.  C# coders are encouraged to help as well since VB.net and C# are equivalent languages and as such 
+can fairly easily be converted between the two with minimal difficulties(although I would prefer native VB.net coders, I understand 
+the prevalency of C# coders outnumbers VB.net coders by quite a bit).
 
-Once I get enough contributors involved I plan on having two "councils" so to speak. The first will be a "coding council" where decisions as to the direction, scope and building of the project are made---the "nuts and bolts" under the hood type of decisions, if you will. The second will be a "football council" where we will talk about implementation of football related things, and the important game aspects of what needs to be included and the best ways to go about it.  Both wil be integral to the development of this game. The football council will come up with ideas to add to the game and the coding council will implement them in code with direction as to how.  I will play a part on both councils(I will not necessarily lead both councils, I will more than likely delegate those tasks once we have a team in place), since I am have a pretty good understanding of both sides.  The football council will probably include people outside of the coding aspect of the game, but we will have transcipts of the chats available for the coders to go through if they are interested in why we came up with the decisions we did as to the direction and implementation of things.
+Once I get enough contributors involved I plan on having two "councils" so to speak. The first will be a "coding council" where 
+decisions as to the direction, scope and building of the project are made---the "nuts and bolts" under the hood type of decisions, 
+if you will. The second will be a "football council" where we will talk about implementation of football related things, and the 
+important game aspects of what needs to be included and the best ways to go about it.  Both wil be integral to the development of 
+this game. The football council will come up with ideas to add to the game and the coding council will implement them in code with
+direction as to how.  I will play a part on both councils(I will not necessarily lead both councils, I will more than likely delegate 
+those tasks once we have a team in place), since I am have a pretty good understanding of both sides.  The football council will 
+probably include people outside of the coding aspect of the game, but we will have transcipts of the chats available for the coders
+to go through if they are interested in why we came up with the decisions we did as to the direction and implementation of things.
 
-For the time being since we are still in the early stages, feel free to submit Pull requests with things you would like to see implemented in the game.  I will be going through and updating the issues with bugs, enhancements and a multitude of other things that need to be worked on.
+For the time being since we are still in the early stages, feel free to submit Pull requests with things you would like to see 
+implemented in the game.  I will be going through and updating the issues with bugs, enhancements and a multitude of other things that
+need to be worked on.
 
-Currently I have a working model of an NFL scheduler which follows all rules, SQL Server 2014 Databases that hold various tables(players, coaches, team data, Play by Play data, stored procedures, etc), a Play by Play parser that parses Play By Play logs and sorts out the various pertinent information and sticks it in an SQL Database so stored procedures can be ran to pull out statistical data for the stat/game engine to be built around using actual real NFL data, an in depth player, coach, GM, scout, owner creator which then stores the information in an SQL database, and the beinnings of the stat engine.
+Currently I have a working model of an NFL scheduler which follows all rules, SQL Server 2014 Databases that hold various 
+tables(players, coaches, team data, Play by Play data, stored procedures, etc), a Play by Play parser that parses Play By Play logs
+and sorts out the various pertinent information and sticks it in an SQL Database so stored procedures can be ran to pull out statistical
+data for the stat/game engine to be built around using actual real NFL data, an in depth player, coach, GM, scout, owner creator 
+which then stores the information in an SQL database, and the beinnings of the stat engine.
 
 
 
