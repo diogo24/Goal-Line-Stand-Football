@@ -28,6 +28,6 @@ and sorts out the various pertinent information and sticks it in an SQL Database
 data for the stat/game engine to be built around using actual real NFL data, an in depth player, coach, GM, scout, owner creator 
 which then stores the information in an SQL database, and the beinnings of the stat engine.
 
-
-
-
+ALL code changes should be made to the Development Branch of the code and then submitted for review before they get added.  
+Also, please update me as to what is being worked on so we do not have overlapping responsibilities or more than one person working
+on the same thing, thereby wasting resources that could be used for something else.
