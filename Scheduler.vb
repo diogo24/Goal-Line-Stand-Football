@@ -42,7 +42,7 @@ Public Class Scheduler
         OutofConfGames() 'schedules the Out of conference games for each team
         InConfFinish() 'schedules the 2 games each team plays against the same place finisher of the other 2 divisions you don't play all the teams in
         GetByeWeek() 'Schdules Bye Weeks for teams
-        EndWithDivisionGames(2)
+
 
         For i As Integer = 1 To 32
             'Console.WriteLine("Team " & i & " " & InitTeams(i).TeamFName & "")
@@ -162,7 +162,7 @@ Public Class Scheduler
             AwayTeam.Add(Div1.Item(1))
             AwayTeam.Add(Div1.Item(2))
             AwayTeam.Add(Div1.Item(3))
-            Teams(1).Add(1)
+            'Teams.Add(1)
 
             EndWithDivisionGames(Div1.Item(1), Div1.Item(2), Div1.Item(3), Div1.Item(4), Teams)
 
@@ -535,58 +535,102 @@ Public Class Scheduler
         'schedules the games
         PickHome = MT.GenerateInt32(1, Teams.Count) 'randomly chooses the home team
         PickHome2 = PickHome 'temp stores the integer for easy removal from the list
-        PickHome = Teams.Item(PickHome - 1)
-        Teams.Remove(PickHome2 - 1) 'removes this team from the list
+        PickHome = Teams.Item(PickHome)
+        Teams.Remove(PickHome2) 'removes this team from the list
 
         PickAway = MT.GenerateInt32(1, Teams.Count) 'randomly chooses the away team from the remaining teams
         PickAway2 = PickAway
-        PickAway = Teams.Item(PickAway - 1)
-        Teams.Remove(PickAway2 - 1)
-
+        PickAway = Teams.Item(PickAway)
+        Teams.Remove(PickAway2)
+        Console.WriteLine("Team " & PickHome & " vs. " & PickAway)
         HTeam.Add(PickHome)
         ATeam.Add(PickAway)
 
         PickHome = MT.GenerateInt32(1, Teams.Count) 'Now need to randomly make one of the reamining teams the home team
         PickHome2 = PickHome
-        PickHome = Teams.Item(PickHome - 1)
-        Teams.Remove(PickHome2 - 1)
-        PickAway = Teams.Item(0) 'only team left in the list
-
+        PickHome = Teams.Item(PickHome)
+        Teams.Remove(PickHome2)
+        PickAway = Teams.Item(1) 'only team left in the list
+        Teams.Clear() 'removes last team
+        Console.WriteLine("Team " & PickHome & " vs. " & PickAway)
         HTeam.Add(PickHome)
         ATeam.Add(PickAway) 'Schedules the first games
         '---------------------------------------------------------------------------------Scheduling the 2nd games------------------------------
 
-        Teams.Add(ATeam.Item(0)) 'adds the away teams back in to schedule the second divisional game---these teams MUST be the home team now!
-        Teams.Add(ATeam.Item(1))
+        Teams.Add(ATeam.Item(1)) 'adds the away teams back in to schedule the second divisional game---these teams MUST be the home team now!
+        Teams.Add(ATeam.Item(2))
 
         PickAway = MT.GenerateInt32(1, HTeam.Count) 'chooses an away team from the teams that were the home team previously
         PickAway2 = PickAway
-        PickAway = HTeam.Item(PickAway - 1) 'takes a home team from the previous week and makes it an away team this week
-        Teams.Remove(PickAway2 - 1) 'removes this team from the list
+        PickAway = HTeam.Item(PickAway) 'takes a home team from the previous week and makes it an away team this week
+        Teams.Remove(PickAway2) 'removes this team from the list
 
         PickHome = MT.GenerateInt32(1, Teams.Count) 'randomly chooses a home team---need to make sure it picks a team that it didn't play the week before...
-        Teams.Add(HTeam.Item(0)) 'adds in other teams to give a full list of divisional opponents to choose game from
-        Teams.Add(HTeam.Item(1))
-        For i As Integer = 0 To HTeam.Count - 1 'cycles through the HTeam.list
 
-            While HTeam(i) = PickAway And ATeam(i) = PickHome 'continues to re-choose team if teams have already played
+        'Teams.Add(HTeam.Item(1)) 'adds in other teams to give a full list of divisional opponents to choose game from
+        'Teams.Add(HTeam.Item(2))
+
+        For i As Integer = 1 To HTeam.Count 'cycles through the HTeam.list
+
+            While HTeam(i) = PickAway And ATeam(i) = PickHome And PickAway = PickHome 'continues to re-choose team if teams have already played
                 PickHome = MT.GenerateInt32(1, Teams.Count)
             End While
         Next i
 
         PickHome2 = PickHome
-        PickHome = Teams.Item(PickHome - 1)
-        Teams.Remove(PickHome2 - 1)
+        PickHome = Teams.Item(PickHome)
+        Teams.Remove(PickHome2)
+        HTeam.Add(PickHome)
+        ATeam.Add(PickAway)
 
+        Dim T1 As Boolean = False
+        Dim T2 As Boolean = False
+        Dim T3 As Boolean = False
+        Dim T4 As Boolean = False
+        Console.WriteLine("Team " & PickHome & " vs. " & PickAway)
+        Teams.Clear()
 
-
-        For i As Integer = 0 To HTeam.Count - 1 'only 2 teams left now, just check to see which one was already the home team and make them the away team.
-            If Teams.Item(i) = HTeam.Item(i) Then
-                ATeam.Add(i)
-                Teams.Remove(i)
-                HTeam.Add(Teams.Item(0)) 'only item left in the list
+        For i As Integer = 1 To HTeam.Count
+            If HTeam.Item(i) = Team1 Then
+                T1 = True
+            ElseIf HTeam.Item(i) = Team2 Then
+                T2 = True
+            ElseIf HTeam.Item(i) = Team3 Then
+                T3 = True
+            ElseIf HTeam.Item(i) = Team4 Then
+                T4 = True
             End If
         Next i
+
+        If T1 = False Then HTeam.Add(Team1)
+        If T2 = False Then HTeam.Add(Team2)
+        If T3 = False Then HTeam.Add(Team3)
+        If T4 = False Then HTeam.Add(Team4)
+
+        T1 = False
+        T2 = False
+        T3 = False
+        T4 = False
+
+        For i As Integer = 1 To ATeam.Count
+            If ATeam.Item(i) = Team1 Then
+                T1 = True
+            ElseIf ATeam.Item(i) = Team2 Then
+                T2 = True
+            ElseIf ATeam.Item(i) = Team3 Then
+                T3 = True
+            ElseIf ATeam.Item(i) = Team4 Then
+                T4 = True
+            End If
+        Next i
+
+        If T1 = False Then ATeam.Add(Team1)
+        If T2 = False Then ATeam.Add(Team2)
+        If T3 = False Then ATeam.Add(Team3)
+        If T4 = False Then ATeam.Add(Team4)
+
+        Console.WriteLine("Team " & HTeam.Item(4) & " vs. " & ATeam.Item(4))
+        ' ATeam.Add(Teams(1))
 
         Teams.Add(HTeam)
         Teams.Add(ATeam)

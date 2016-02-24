@@ -132,5 +132,11 @@ Represents the connection and commands used to retrieve and save data.
 4 games are played against a single other division(each team played once), and the remaining two games are played against the other 2 divisions' teams
 that finished in the same place in their division(ie, 3rd place team from Div1 plays 3rd place team from Div3 and Div4 because they already are playing</summary> 
 </member>
+<member name="M:Football2.Scheduler.EndWithDivisionGames(System.Int32,System.Int32,System.Int32,System.Int32,Microsoft.VisualBasic.Collection)">
+<summary>creates a schedule where the last 2 games in the season are divisional games. 
+currently in the NFL the last 2 games each teams play every year are games within
+the division. Takes the 4 Div teams from ScheduleDivGames and then schedules 2 games checking 
+to make sure they both can be played and are not both the same game</summary>
+</member>
 </members>
 </doc>
