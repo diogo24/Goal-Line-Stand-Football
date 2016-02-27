@@ -22,6 +22,19 @@ For the time being since we are still in the early stages, feel free to submit P
 implemented in the game.  I will be going through and updating the issues with bugs, enhancements and a multitude of other things that
 need to be worked on.
 
+Here are the meanings of the Labels on Issues:
+
+CODEREDESIGN - This is an issue for coders that deals with redesigning some part of the existing code
+BUILD- This is something that needs to be built into the game as it is not there currently, or not there in any meaningful fashion
+FOOTBALLRELATED- This is an issue for the "football side" to develop/hash out so we can move it into a coding phase
+ENHANCEMENT-Something that will be added to the features of an already existing item
+
+PROJECT GUIDELINES
+
+OOP guidelines are to be followed at all times.
+Code is to be kept organized within classes so things don't get cluttered. Skeleton code will be coming shortly to outline the 
+various classes with Docstring notation to give further description.
+
 Currently I have a working model of an NFL scheduler which follows all rules, SQL Server 2014 Databases that hold various 
 tables(players, coaches, team data, Play by Play data, stored procedures, etc), a Play by Play parser that parses Play By Play logs
 and sorts out the various pertinent information and sticks it in an SQL Database so stored procedures can be ran to pull out statistical
