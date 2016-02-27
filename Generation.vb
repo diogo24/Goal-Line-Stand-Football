@@ -63,7 +63,8 @@ Public Class Generation
     End Function
 
     Public Sub GenOwners(ByVal NumOwners As Integer)
-        Dim SQLFieldNames As String = "OwnerID int NOT NULL, TeamID int NOT NULL, FName varchar(20) NOT NULL, LName varchar(20) NOT NULL, College varchar(50) NOT NULL, OwnerRep int NOT NULL, Age int NOT NULL, Experience int NOT NULL, GMPatience int NOT NULL, CoachPatience int NOT NULL, Meddles int NOT NULL, WantsWinner int NOT NULL, SpendsMoney int NOT NULL CONSTRAINT Owner_ID PRIMARY KEY(OwnerID)"
+        Dim SQLFieldNames As String = "OwnerID int NOT NULL, TeamID int NOT NULL, FName varchar(20) NOT NULL, LName varchar(20) NOT NULL, College varchar(50) NOT NULL, OwnerRep int NOT NULL, Age int NOT NULL, Experience int NOT NULL, 
+GMPatience int NOT NULL, CoachPatience int NOT NULL, Meddles int NOT NULL, WantsWinner int NOT NULL, SpendsMoney int NOT NULL CONSTRAINT Owner_ID PRIMARY KEY(OwnerID)"
 
         GetTables.CreateTable(OwnerDT, "Owners", SQLFieldNames) 'Inside CreateTable, it checks to see if a table exists or not.  If it does not, it creates one, if it does it exits.
         GetTables.DeleteTable(OwnerDT, "Owners")
@@ -92,7 +93,12 @@ Public Class Generation
     End Sub
 
     Public Sub GenGMs(ByVal NumGMs As Integer)
-        Dim SQLFieldNames As String = "GMID int NOT NULL, TeamID int NOT NULL, FName varchar(20) NOT NULL, LName varchar(20) NOT NULL, College varchar(50) NOT NULL, Age int NOT NULL, Experience int NOT NULL, CoachPatience int NOT NULL, Risktaker int NOT NULL, ValuesDraftPicks int NOT NULL, ValuesCombine int NOT NULL, ValuesCharacter int NOT NULL, ValuesProduction int NOT NULL, FranchiseTag int NOT NULL, JudgingDraft int NOT NULL, JudgingFA int NOT NULL, JudgingOwn int NOT NULL, JudgingQB int NOT NULL, JudgingRB int NOT NULL, JudgingRec int NOT NULL, JudgingOL int NOT NULL, JudgingDL int NOT NULL, JudgingLB int NOT NULL, JudgingCB int NOT NULL, JudgingSF int NOT NULL, Loyalty int NOT NULL, Ego int NOT NULL, OffPhil varchar(20) NOT NULL, QBImp int NOT NULL, RBImp int NOT NULL, FBImp int NOT NULL, WRImp int NOT NULL, WR2Imp int NOT NULL, WR3Imp int NOT NULL, LTImp int NOT NULL, LGImp int NOT NULL, CImp int NOT NULL, RGImp int NOT NULL, RTImp int NOT NULL, TEImp int NOT NULL, DefPhil varchar(20) NOT NULL, DEImp int NOT NULL, DE2Imp int NOT NULL, DTImp int NOT NULL, DT2Imp int NOT NULL, NTImp int NOT NULL, MLBImp int NOT NULL, WLBImp int NOT NULL, SLBImp int NOT NULL, ROLBImp int NOT NULL, LOLBImp int NOT NULL, CB1Imp int NOT NULL, CB2Imp int NOT NULL, CB3Imp int NOT NULL, FSImp int NOT NULL, SSImp int NOT NULL, DraftStrategy varchar(20) NOT NULL, TeamBuilding varchar(20) NOT NULL,  CONSTRAINT GM_ID PRIMARY KEY(GMID)"
+        Dim SQLFieldNames As String = "GMID int NOT NULL, TeamID int NOT NULL, FName varchar(20) NOT NULL, LName varchar(20) NOT NULL, College varchar(50) NOT NULL, Age int NOT NULL, Experience int NOT NULL, CoachPatience int NOT NULL, 
+Risktaker int NOT NULL, ValuesDraftPicks int NOT NULL, ValuesCombine int NOT NULL, ValuesCharacter int NOT NULL, ValuesProduction int NOT NULL, FranchiseTag int NOT NULL, JudgingDraft int NOT NULL, JudgingFA int NOT NULL, JudgingOwn int NOT NULL, 
+JudgingQB int NOT NULL, JudgingRB int NOT NULL, JudgingRec int NOT NULL, JudgingOL int NOT NULL, JudgingDL int NOT NULL, JudgingLB int NOT NULL, JudgingCB int NOT NULL, JudgingSF int NOT NULL, Loyalty int NOT NULL, Ego int NOT NULL, 
+OffPhil varchar(20) NOT NULL, QBImp int NOT NULL, RBImp int NOT NULL, FBImp int NOT NULL, WRImp int NOT NULL, WR2Imp int NOT NULL, WR3Imp int NOT NULL, LTImp int NOT NULL, LGImp int NOT NULL, CImp int NOT NULL, RGImp int NOT NULL, RTImp int NOT NULL, 
+TEImp int NOT NULL, DefPhil varchar(20) NOT NULL, DEImp int NOT NULL, DE2Imp int NOT NULL, DTImp int NOT NULL, DT2Imp int NOT NULL, NTImp int NOT NULL, MLBImp int NOT NULL, WLBImp int NOT NULL, SLBImp int NOT NULL, ROLBImp int NOT NULL, 
+LOLBImp int NOT NULL, CB1Imp int NOT NULL, CB2Imp int NOT NULL, CB3Imp int NOT NULL, FSImp int NOT NULL, SSImp int NOT NULL, DraftStrategy varchar(20) NOT NULL, TeamBuilding varchar(20) NOT NULL,  CONSTRAINT GM_ID PRIMARY KEY(GMID)"
 
         GetTables.CreateTable(GMDT, "GMs", SQLFieldNames)
         GetTables.DeleteTable(GMDT, "GMs")
@@ -147,6 +153,13 @@ Public Class Generation
     End Sub
     Public Sub GenCoaches(ByVal NumCoaches As Integer)
 
+        Dim SQLFieldNames As String = "CoachID int NOT NULL, TeamID int NOT NULL, FName varchar(20) NOT NULL, LName varchar(20) NOT NULL, College varchar(50) NOT NULL, Age int NOT NULL, Experience int NOT NULL, OffPhil varchar(50) NOT NULL, 
+DefPhil Varchar(50) NOT NULL, LoyaltyPlayers int NOT NULL, LoyaltyCoaches int NOT NULL, Ego int NOT NULL, OffAbility int NOT NULL, DefAbility int NOT NULL, Stability int NOT NULL, DevPlayers int NOT NULL, JudgingAct int Not NULL, JudgingPot int Not NULL,
+JudgingQB int NOT NULL, JudgingRB int NOT NULL, JudgingRec int NOT NULL, JudgingOL int NOT NULL, JudgingDL int NOT NULL, JudgingLB int NOT NULL, JudgingCB int NOT NULL, JudgingSF int NOT NULL, Accountability int NOT NULL, Motivating int NOT NULL, 
+TimeMgmt int NOT NULL, Clutch int NOT NULL, Conservative int NOT NULL, FBInt int NOT NULL, Adjustments int NOT NULL, ValuesST int NOT NULL, ValuesCharacter int NOT NULL, WorkEthic int NOT NULL, Preparation int NOT NULL, Focus int NOT NULL, 
+PlaycallingSkill int NOT NULL, CONSTRAINT Coach_ID PRIMARY KEY(CoachID)"
+
+        GetTables.CreateTable(CoachDT, "Coaches", SQLFieldNames)
         GetTables.DeleteTable(CoachDT, "Coaches")
         GetTables.LoadTable(CoachDT, "Coaches")
         CoachDT.Rows.Add(0)
@@ -209,6 +222,11 @@ Public Class Generation
     End Sub
     Public Sub GenScouts(ByVal NumScouts As Integer)
 
+        Dim SQLFieldNames As String = "ScoutID int Not NULL, TeamID int Not NULL, FName varchar(20) Not NULL, LName varchar(20) Not NULL, College varchar(50) Not NULL, Age int Not NULL, Experience int Not NULL, OffPhil varchar(20) Not NULL,
+DefPhil varchar(20) Not NULL, JudgingAct int Not NULL, JudgingPot int Not NULL, JudgingQB Int Not NULL, JudgingRB int Not NULL, JudgingRec int Not NULL, JudgingOL int Not NULL, JudgingDL int Not NULL, JudgingLB int Not NULL, JudgingCB int Not NULL, 
+JudgingSF int Not NULL, FBInt int Not NULL, ValuesCharacter int Not NULL, ProductionVsCombine int Not NULL, AthleticismVsMental int Not NULL,  WorkEthic int Not NULL, CONSTRAINT Scout_ID PRIMARY KEY(ScoutID)"
+
+        GetTables.CreateTable(ScoutDT, "Scouts", SQLFieldNames)
         GetTables.DeleteTable(ScoutDT, "Scouts")
         GetTables.LoadTable(ScoutDT, "Scouts")
         ScoutDT.Rows.Add(0)
@@ -258,6 +276,38 @@ Public Class Generation
     End Sub
     Public Sub GenDraftPlayers(ByVal NumPlayers As Integer)
 
+        Dim SQLFieldNames As String = "DraftID int Not NULL, FName varchar(20) not NULL, LName varchar(20) Not NULL, College varchar(50) Not NULL, Age int Not NULL, CollegePOS varchar(5) Not NULL, ActualGrade decimal(5,2) Not NULL, 
+ProjNFLPos varchar(5) Not NULL, Height int Not Null, Weight int Not NULL, FortyYardTime decimal(3,2) Not NULL, TwentyYardTime decimal(3,2) Not NULL, TenYardTime decimal(3,2) Not NULL, ShortShuttle decimal(3,2) Not NULL, BroadJump int Not NULL, 
+VertJump decimal(3,1) Not NULL, ThreeConeDrill decimal(3,2) Not NULL, BenchPress int Not NULL, InterviewSkills int Not NULL, WonderlicTest int Not NULL, SkillsTranslateToNFL int Not NULL, QBDropQuickness decimal(3,1) NULL, 
+QBSetupQuickness decimal(3,1) NULL, QBReleaseQuickness decimal(3,1) NULL, QBShortAcc decimal(3,1) NULL, QBMedAcc decimal(3,1) NULL, QBLongAcc decimal(3,1) NULL, QBDecMaking decimal(3,1) NULL, QBFieldVision decimal(3,1) NULL, QBPoise decimal(3,1) NULL, 
+QBBallHandling decimal(3,1) NULL, QBTiming decimal(3,1) NULL, QBDelivery decimal(3,1) NULL, QBFollowThrough decimal(3,1) NULL, QBAvoidRush decimal(3,1) NULL, QBEscape decimal(3,1) NULL, QBScrambling decimal(3,1) NULL, QBRolloutRight decimal(3,1) NULL, 
+QBRolloutLeft decimal(3,1) NULL, QBArmStrength decimal(3,1) NULL, QBZip decimal(3,1) NULL, QBTouchScreenPass decimal(3,1) NULL, QBTouchSwingPass decimal(3,1) NULL, QBEffectiveShortOut decimal(3,1) NULL, QBEffectiveGoRoute decimal(3,1) NULL, 
+QBEffectivePostRoute decimal(3,1) NULL, QBEffectiveCornerRoute decimal(3,1) NULL, QBEffectiveDeepOut decimal(3,1) NULL, RBEffortBlocking decimal(3,1) NULL, RBDurability decimal(3,1) NULL, RBBallSecurity decimal(3,1) NULL, RBPassBlocking decimal(3,1) NULL, 
+RBHands decimal(3,1) NULL, RBStart decimal(3,1) NULL, RBRunVision decimal(3,1) NULL, RBInsideAbility decimal(3,1) NULL, RBOutsideAbility decimal(3,1) NULL, RBElusiveAbility decimal(3,1) NULL, RBPowerAbility decimal(3,1) NULL, 
+RBRunBlocking decimal(3,1) NULL, RBRouteRunning decimal(3,1) NULL, RBRunningStyle varchar(15) NULL, Athleticism decimal(3,1) NULL, QAB decimal(3,1) NULL, COD decimal(3,1) NULL, WRShortRoute decimal(3,1) NULL, WRCrowdReaction decimal(3,1) NULL, 
+WRConcentration decimal(3,1) NULL, WRFieldAwareness decimal(3,1) NULL, WRBodyCatch decimal(3,1) NULL, WRBlocking decimal(3,1) NULL, WRRelease decimal(3,1) NULL, WRStart decimal(3,1) NULL, WRPatterns decimal(3,1) NULL, WRMedRoute decimal(3,1) NULL, 
+WRDeepRoute decimal(3,1) NULL, WRBallAdjust decimal(3,1) NULL, WRHandCatch decimal(3,1) NULL, WRRAC decimal(3,1) NULL, WRCatchWhenHit decimal(3,1) NULL, TEGetOffLineRunBlock decimal(3,1) NULL, TEOneOnOneBlocking decimal(3,1) NULL, 
+TEDoubleTeamBlocking decimal(3,1) NULL, TEDownBlocking decimal(3,1) NULL, TETurnAndWallBlocking decimal(3,1) NULL, TEsustainBlocking decimal(3,1) NULL, TECrowdReaction decimal(3,1) NULL, TECatchWhenHit decimal(3,1) NULL, TEConcentration decimal(3,1) NULL,
+TEBodyCatch decimal(3,1) NULL, TEFieldAwareness decimal(3,1) NULL, TEPassProtect decimal(3,1) NULL, TEDriveIntoPassRoute decimal(3,1) NULL, TEPatterns decimal(3,1) NULL, TEShortRoute decimal(3,1) NULL, TEMedRoute decimal(3,1) NULL, 
+TEDeepRoute decimal(3,1) NULL, TEBallAdjust decimal(3,1) NULL, TEHandCatch decimal(3,1) NULL, TERAC decimal(3,1) NULL, OLGetOutside decimal(3,1) NULL, OLReachBlock decimal(3,1) NULL, OLTurnDefender decimal(3,1) NULL, OLPulling decimal(3,1) NULL, 
+OLTrapBlock decimal(3,1) NULL, OL2ndLevelPull decimal(3,1) NULL, OLAdjusttoLB decimal(3,1) NULL, OLSlide decimal(3,1) NULL, OLHandUse decimal(3,1) NULL, OLHandPop decimal(3,1) NULL, OLLongSnapPotential decimal(3,1) NULL, 
+OLGetOffLineRunBlock decimal(3,1) NULL, OLOneOnOneBlocking decimal(3,1) NULL, OLDriveBlocking decimal(3,1) NULL, OLDownBlocking decimal(3,1) NULL, OLSustainBlock decimal(3,1) NULL, OLPassBlocking decimal(3,1) NULL, OLPassDrops decimal(3,1) NULL, 
+OLFeetSetup decimal(3,1) NULL, OLAnchorAbility decimal(3,1) NULL, OLRecover decimal(3,1) NULL, OLStrength decimal(3,1) NULL, DLStyle varchar(15) NULL, DLRunAtHim decimal(3,1) NULL, DLTackling decimal(3,1) NULL, DLAgainstTrapAbility decimal(3,1) NULL, 
+DLSlideAbility decimal(3,1) NULL, DLRunPursuit decimal(3,1) NULL, DLPassRushTechnique varchar(15) NULL, DLHandUse decimal(3,1) NULL, DLShedVsRunAway decimal(3,1) NULL, DLShedRunBlock decimal(3,1) NULL, DLTackleVsRunAway decimal(3,1) NULL, 
+DLChangeDirection decimal(3,1) NULL, DLReleaseOffBall decimal(3,1) NULL, DLOneOnOneAbility decimal(3,1) NULL, DLDoubleTeamAbility decimal(3,1) NULL, DLDefeatBlock decimal(3,1) NULL, DLFirstStepPassRush decimal(3,1) NULL, DLShedPassBlock decimal(3,1) NULL,
+DLBurst decimal(3,1) NULL, DLPressure decimal(3,1) NULL, DLFinish decimal(3,1) NULL, LBDropDepth decimal(3,1) NULL, LBCoverage decimal(3,1) NULL, LBHands decimal(3,1) NULL, LBBlitz decimal(3,1) NULL, LBPassRushType varchar(15) NULL, 
+LBRead decimal(3,1) NULL, LBInstincts decimal(3,1) NULL, LBDefeatBlocks decimal(3,1) NULL, LBShedBlocks decimal(3,1) NULL, LBInsideTackle decimal(3,1) NULL, LBOutsideTackle decimal(3,1) NULL, DBPressBailCoverage decimal(3,1) NULL, 
+DBBallReaction decimal(3,1) NULL, DBTackling decimal(3,1) NULL, DBZoneCoverage decimal(3,1) NULL, DBRuncontain decimal(3,1) NULL, DBWardOffBlockers decimal(3,1) NULL, DBRunTackling decimal(3,1) NULL, DBHands decimal(3,1) NULL,
+DBBump decimal(3,1) NULL, DDBRunContain decimal(3,1) NULL, DBBlitz decimal(3,1) NULL, DBRead decimal(3,1) NULL, DBInstincts decimal(3,1) NULL, DBBackpedal decimal(3,1) NULL, DBTurn decimal(3,1) NULL, DBClose decimal(3,1) NULL, DBRange decimal(3,1) NULL, 
+DBCatchUpSpeed decimal(3,1) NULL, DBManToManCoverage decimal(3,1) NULL, DBBurst decimal(3,1) NULL, DBCOBP decimal(3,1) NULL, DBFeet decimal(3,1) NULL, KPlantRelationship varchar(15) NULL, KApproachAngle varchar(15) NULL, KBallFlight varchar(15) NULL, 
+KSteppingPattern varchar(15) NULL, KKickingStyle varchar(15) NULL, KHandlingWind decimal(3,1) NULL, KTackling decimal(3,1) NULL, KRunAndPassAbility decimal(3,1) NULL, KKOFootSpeed decimal(3,1) NULL, KFGOperationTimes decimal(3,1) NULL, 
+KAccuracy decimal(3,1) NULL, KHandlingPressure decimal(3,1) NULL, KFootSpeed decimal(3,1) NULL, KKickQuickness decimal(3,1) NULL, KKickRise decimal(3,1) NULL, KKOProduction decimal(3,1) NULL, KKOMentalStability decimal(3,1) NULL, 
+PFootSpeed decimal(3,1) NULL, PApproachLine decimal(3,1) NULL, PHandlingTime decimal(3,1) NULL, PSteppingPattern varchar(15) NULL, PHands decimal(3,1) NULL, PTackling decimal(3,1) NULL, PRunAndPassAbility decimal(3,1) NULL, PDistance decimal(3,1) NULL, 
+PHangTime decimal(3,1) NULL, PPressureKicking decimal(3,1) NULL, PBlockZone decimal(3,1) NULL, PHandToFootTime decimal(3,1) NULL, PTiming decimal(3,1) NULL, Flexibility decimal(3,1) NULL, Clutch decimal(3,1) NULL, Production decimal(3,1) NULL, 
+Consistency decimal(3,1) NULL, TeamPlayer decimal(3,1) NULL, Instincts decimal(3,1) NULL, Focus decimal(3,1) NULL, PlayStrength decimal(3,1) NULL, Durability decimal(3,1) NULL, Explosion decimal(3,1) NULL, DeliversBlow decimal(3,1) NULL,
+Leadership decimal(3,1) NULL, Character decimal(3,1) NULL CONSTRAINT Draft_ID PRIMARY KEY(DraftID)"
+
+        GetTables.CreateTable(DraftDT, "DraftPlayers", SQLFieldNames)
         GetTables.DeleteTable(DraftDT, "DraftPlayers")
         GetTables.LoadTable(DraftDT, "DraftPlayers")
         DraftDT.Rows.Add(0)
@@ -269,18 +319,18 @@ Public Class Generation
             DraftDT.Rows(i).Item("College") = GetName("Colleges.txt", 2182)
             DraftDT.Rows(i).Item("Age") = GetDraftAge()
             DraftDT.Rows(i).Item("CollegePOS") = GetCollegePos()
-            GetDraftGrades(i, DraftDT.Rows(i).Item("CollegePos"))
+            GetDraftGrades(i, DraftDT.Rows(i).Item("CollegePos")) '#### TODO---> Convert from a sub to a function since it's returning a value
             DraftDT.Rows(i).Item("Height") = GetHeight(DraftDT.Rows(i).Item("CollegePOS"))
             DraftDT.Rows(i).Item("Weight") = GetWeight(DraftDT.Rows(i).Item("CollegePOS"), DraftDT.Rows(i).Item("Height"))
             'DraftDT.Rows(i).Item("ArmLength")=
             'DraftDT.Rows(i).Item("HandLength")=
-            DraftDT.Rows(i).Item("40YardTime") = Get40Time(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("20YardTime") = Get20Time(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("10YardTime") = Get10Time(DraftDT.Rows(i).Item("CollegePOS"))
+            DraftDT.Rows(i).Item("FortyYardTime") = Get40Time(DraftDT.Rows(i).Item("CollegePOS"))
+            DraftDT.Rows(i).Item("TwentyYardTime") = Get20Time(DraftDT.Rows(i).Item("CollegePOS"))
+            DraftDT.Rows(i).Item("TenYardTime") = Get10Time(DraftDT.Rows(i).Item("CollegePOS"))
             DraftDT.Rows(i).Item("ShortShuttle") = GetShortShuttle(DraftDT.Rows(i).Item("CollegePOS"))
             DraftDT.Rows(i).Item("BroadJump") = GetBroadJump(DraftDT.Rows(i).Item("CollegePOS"))
             DraftDT.Rows(i).Item("VertJump") = GetVertJump(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("3ConeDrill") = Get3Cone(DraftDT.Rows(i).Item("CollegePOS"))
+            DraftDT.Rows(i).Item("ThreeConeDrill") = Get3Cone(DraftDT.Rows(i).Item("CollegePOS"))
             DraftDT.Rows(i).Item("BenchPress") = GetBenchPress(DraftDT.Rows(i).Item("CollegePOS"))
             DraftDT.Rows(i).Item("InterviewSkills") = CInt(MT.GetGaussian(49.5, 16.5))
             DraftDT.Rows(i).Item("WonderlicTest") = GetWonderlic(DraftDT.Rows(i).Item("CollegePOS"))
@@ -292,6 +342,20 @@ Public Class Generation
     End Sub
     Public Sub GetRosterPlayers(ByVal numplayers As Integer)
 
+        Dim SQLFieldNames As String = "PlayerID int Not NULL, TeamID int NULL, FName varchar(20) Not NULL, LName varchar(20) Not NULL, College varchar(50) Not NULL, CollegePOS varchar(5) Not NULL, DOB nvarchar(12) not NULL, Age int Not NULL,
+Height int Not NULL, Weight int Not NULL, QBDropQuickness int NULL, QBSetUpQuickness int NULL, QBReleaseQuickness int NULL, QBShortAcc int NULL,  QBMedAcc int NULL, QBLongAcc int NULL, QBDecMaking int NULL, QBFieldVision int NULL, QBPoise int NULL, 
+QBBallHandling int NULL, QBTiming int NULL, QBDeliveryQuickness int NULL, QBAvoidRush int NULL, QBScrambling int NULL, QBRolloutRight int NULL, QBRolloutLeft int NULL, QBArmStrength int NULL, QBTouch int NULL, RBRunVision int NULL, 
+RBInsideAbility int NULL, RBOutsideAbility int NULL, RBElusiveAbility int NULL, RBPowerAbility int NULL, RBRouteRunning int NULL, RBRunningStyle varchar(20) Not NULL, ORunAfterCatch int NULL, OReleasePassRoute int NULL, OShortRoute int NULL, 
+OMedRoute int NULL, ODeepRoute int NULL, OScreenRoute int NULL, OSwingRoute int NULL, ORunBlock int NULL, OPassBlock int NULL, OSustainBlock int NULL, OLDriveBlocking int NULL, OLPulling int NULL, OLInSpace int NULL, OLHandUse int NULL, 
+OLAnchorAbility int NULL, OLRecover int NULL, OLLongSnapPot int NULL, DLOneOnOneAbility int NULL, DLStyle varchar(20)  NULL, DLDoubleTeamAbility int NULL, DLRunAtHim int NULL, DLHandUse int NULL, DDefeatBlock int NULL, DShedBlock int NULL, 
+DBallPursuit int NULL, DReadPlay int NULL, DMantoManCoverage int NULL, DZoneCoverage int NULL, DBlitzAbility int NULL, LBDropDepth int NULL, LBFillGaps int NULL, DBTurnAndRun int NULL, DBBreakOnBall int NULL, DBClosingSpeed int NULL,
+DBPressCoverage int NULL, DBRunContain int NULL, KickAccuracy int NULL, KickQuickness int NULL, KickStrength int NULL, KickHandlingwind int NULL, KickRunningAbility int NULL, KickPassingAbility int NULL, PuntHangTime int NULL, Strength int NULL, 
+Speed int NULL, Acceleration int NULL, Agility int NULL, Intelligence int NULL, Explosion int NULL, Athleticism int NULL, JumpingAbility int NULL, ChangeDirections int NULL, Character int NULL, Durability int NULL, Instincts int NULL, Focus int NULL, 
+TeamPlayer int NULL, Consistency int NULL, Leadership int NULL, FieldAwareness int NULL, Clutch int NULL, Fearless int NULL, Aggressive int NULL, RiskTaker int NULL, FilmStudy int NULL, WorkEthic int NULL, BallSecurity int NULL, HandCatch int NULL, 
+Bodycatch int NULL, CatchWhenHit int NULL, AdjustToBall int NULL, Tackling int NULL, RETKickReturn int NULL, RETPuntReturn int NULL, STCoverage int NULL, STWillingness int NULL, STAssignment int NULL, STDiscipline int NULL, LSSnapTime int NULL,
+LSSnapAccuracy int NULL CONSTRAINT PID PRIMARY KEY(PlayerID)"
+
+        GetTables.CreateTable(PlayerDT, "Players", SQLFieldNames)
         GetTables.DeleteTable(PlayerDT, "Players")
         GetTables.LoadTable(PlayerDT, "Players")
         PlayerDT.Rows.Add(0)
@@ -339,6 +403,7 @@ Public Class Generation
             PlayerDT.Rows(i).Item("RETKickReturn") = GetKickRetAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
             PlayerDT.Rows(i).Item("RETPuntReturn") = GetPuntRetAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
             PlayerDT.Rows(i).Item("DOB") = GetDOB(PlayerDT.Rows(i).Item("Age"), i)
+            'Console.WriteLine(PlayerDT.Rows(i).Item("DOB"))
             GetSTAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
             GetLSAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
         Next i
@@ -346,6 +411,16 @@ Public Class Generation
         For i As Integer = 1 To 17
             PutPlayerOnTeam(i)
         Next i
+
+        For i As Integer = 0 To PlayerDT.Rows.Count - 1
+            For col As Integer = 0 To PlayerDT.Columns.Count - 1
+                If PlayerDT.Rows(i).Item(col) Is DBNull.Value Then
+                    PlayerDT.Rows(i).Item(col) = 0
+                End If
+            Next col
+        Next i
+
+        PlayerDT.Rows(0).Delete()
 
         GetTables.UpdateTable(PlayerDT, "Players")
     End Sub
@@ -406,12 +481,16 @@ Public Class Generation
 
         For i = 1 To 32 'numteams
             Dim getnumpos As Integer = MT.GenerateInt32(MinAllowed, NumAllowed)
+
             For n As Integer = 1 To getnumpos
-                Dim ChooseArray As Integer = MT.GenerateInt32(0, RowArray.Count - 1)
-                Dim GetRow As Integer = RowArray.Item(ChooseArray)
-                RowArray.RemoveAt(ChooseArray)
-                PlayerDT.Rows(GetRow).Item("TeamID") = i
+                If RowArray.Count > 0 Then
+                    Dim ChooseArray As Integer = MT.GenerateInt32(0, RowArray.Count - 1)
+                    Dim GetRow As Integer = RowArray.Item(ChooseArray)
+                    RowArray.RemoveAt(ChooseArray)
+                    PlayerDT.Rows(GetRow).Item("TeamID") = i
+                End If
             Next n
+
         Next i
 
     End Sub
@@ -1101,7 +1180,7 @@ Public Class Generation
                 PlayerDT.Rows(i).Item("LSSnapAccuracy") = 0
         End Select
     End Sub
-    Private Function GetDOB(ByVal Age As Integer, ByVal i As Integer) As Date
+    Private Function GetDOB(ByVal Age As Integer, ByVal i As Integer) As String
         Dim Day As Integer
         Dim Month As Integer
         Dim Year As Integer
@@ -1119,15 +1198,32 @@ Public Class Generation
         End Select
 
         Year = Date.Today.Year - Age
-
+        Dim DOB As String = "" & Month & "/" & Day & "/" & Year & ""
+        Return DOB
         'TestDate = Convert.ToDateTime("" & Month & "/" & Day & "/" & Year).Date
-        Return Convert.ToDateTime("" & Month & "/" & Day & "/" & Year).Date
+        'Return Convert.ToDateTime("" & Month & "/" & Day & "/" & Year).ToShortDateString
     End Function
-    Private Function GetNFLPos(ByVal Pos As String) As String
+    ''' <summary>
+    ''' Common Position switches include:
+    ''' QB ---> WR ---Typically very athletic QB's that aren't good enough at QB for the NFL(Julian Edelman for example)
+    ''' QB ---> RB ---Typically very athletic QB's that are option type QB's in college who do a lot of running(Michael Robinson for example)
+    ''' DE ---> OLB ---Typically "smaller", athletic DE's in college are too small to play DE in the NFL(Jerry Hughes for example)
+    ''' CB ---> SF ---Typically slower type CB's in college that have good ball and football instincts but lack the speed to cover WR's or hands to catch the ball in the NFL(Jairius Byrd, Aaron Williams, and Devin McCourty for example)
+    ''' WR ---> SF ---Typically slower type WR's that are good playing the ball but lack hands needed at WR(George Wilson for example)
+    ''' OT ---> OG ---Typically "smaller" OT's in college that are the size of guards in the NFL(one of the most common--numerous examples)
+    ''' LB ---> SF ---Typically "smaller" LB's in college that are athletic and fast enough to play safety but don't have enough size to play LB(Adam Archuleta for example)
+    ''' FB ---> TE ---Typically the more athletic FB's in college in a run heavy offensive scheme can make more use of their skills as a TE or H-Back(Charles Clay for example)
+    ''' other examples and less common changes occur---
+    ''' 
+    ''' Need to figure out how often and under what circumstances a player would have a different position---currently it sets it to the same position as they are in college
+    ''' </summary>
+    ''' <param name="Pos"></param>
+    ''' <returns></returns>
+    Private Function GetNFLPos(ByVal Pos As String) As String '####TODO: Determine how often and waht percentage of players would play a different position ni the NFL than in college(I'm thinking maybe 5-7%, most common is OT to OG and CB to SF
         'Players who are too small/light/slow for their current college positions
         'can be projected to play a different position in the NFL
-
-
+        '
+        Return Pos
     End Function
     Private Sub GetPosSkills(ByVal Pos As String, ByVal i As Integer, ByVal DT As DataTable)
         Select Case Pos
@@ -1224,6 +1320,7 @@ Public Class Generation
                 DT.Rows(i).Item("DZoneCoverage") = MT.GetGaussian(49.5, 16.5)
             Case "OLB", "ILB"
                 DT.Rows(i).Item("LBDropDepth") = MT.GetGaussian(49.5, 16.5)
+                DT.Rows(i).Item("LBFillGaps") = MT.GetGaussian(49.5, 16.5)
                 DT.Rows(i).Item("DDefeatBlock") = MT.GetGaussian(49.5, 16.5)
                 DT.Rows(i).Item("DShedBlock") = MT.GetGaussian(49.5, 16.5)
                 DT.Rows(i).Item("DBallPursuit") = MT.GetGaussian(49.5, 16.5)
@@ -1423,6 +1520,7 @@ Public Class Generation
             Case "CB" : NumString = CStr(Math.Round(MT.GetGaussian(35.5467, 3.33027), 1))
             Case "FS" : NumString = CStr(Math.Round(MT.GetGaussian(35.0238, 3.37348), 1))
             Case "SS" : NumString = CStr(Math.Round(MT.GetGaussian(35.2439, 3.07433), 1))
+            Case "K", "P" : NumString = CStr(0)
         End Select
 
         NumStr = CInt(NumString)
@@ -2843,7 +2941,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("OLAnchorAbility") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("OLRecover") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("OLStrength") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
-                        DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
+                        'DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(6.5, 0.4166673), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(6.5, 0.4166673), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(6.5, 0.4166673), 1)
@@ -2859,7 +2957,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("OLAnchorAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLRecover") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLStrength") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
+                        'DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -2875,7 +2973,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("OLAnchorAbility") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("OLRecover") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("OLStrength") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
-                        DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
+                        'DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
@@ -2891,7 +2989,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("OLAnchorAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLRecover") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLStrength") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
+                        'DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -2907,7 +3005,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("OLAnchorAbility") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLRecover") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLStrength") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
+                        'DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
@@ -2923,7 +3021,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("OLAnchorAbility") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLRecover") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("OLStrength") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
+                        'DraftDT.Rows(Num).Item("OLSustain") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
@@ -2947,7 +3045,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("DLOneOnOneAbility") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("DLDoubleTeamAbility") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("DLDefeatBlock") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
-                        DraftDT.Rows(Num).Item("DLShedBlock") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
+                        DraftDT.Rows(Num).Item("DLShedRunBlock") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("DLFirstStepPassRush") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("DLShedPassBlock") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("DLBurst") = Math.Round(MT.GetGaussian(6.5, 0.416667), 1)
@@ -2961,7 +3059,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("DLOneOnOneAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDoubleTeamAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDefeatBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("DLShedBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
+                        DraftDT.Rows(Num).Item("DLShedRunBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLFirstStepPassRush") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLShedPassBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLBurst") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -2975,7 +3073,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("DLOneOnOneAbility") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("DLDoubleTeamAbility") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("DLDefeatBlock") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
-                        DraftDT.Rows(Num).Item("DLShedBlock") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
+                        DraftDT.Rows(Num).Item("DLShedRunBlock") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("DLFirstStepPassRush") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("DLShedPassBlock") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
                         DraftDT.Rows(Num).Item("DLBurst") = Math.Round(MT.GetGaussian(6.25, 0.583333), 1)
@@ -2989,7 +3087,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("DLOneOnOneAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDoubleTeamAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDefeatBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("DLShedBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
+                        DraftDT.Rows(Num).Item("DLShedRunBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLFirstStepPassRush") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLShedPassBlock") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLBurst") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -3003,7 +3101,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("DLOneOnOneAbility") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDoubleTeamAbility") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDefeatBlock") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("DLShedBlock") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
+                        DraftDT.Rows(Num).Item("DLShedRunBlock") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLFirstStepPassRush") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLShedPassBlock") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLBurst") = Math.Round(MT.GetGaussian(5.5, 0.66667), 1)
@@ -3017,7 +3115,7 @@ Public Class Generation
                         DraftDT.Rows(Num).Item("DLOneOnOneAbility") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDoubleTeamAbility") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLDefeatBlock") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("DLShedBlock") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
+                        DraftDT.Rows(Num).Item("DLShedRunBlock") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLFirstStepPassRush") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLShedPassBlock") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                         DraftDT.Rows(Num).Item("DLBurst") = Math.Round(MT.GetGaussian(5, 0.66667), 1)

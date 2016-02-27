@@ -31,6 +31,13 @@ Public Class DataFunctions
         End If
 
         Dim SQL As SqlClient.SqlCommand = New SqlClient.SqlCommand("Select * From " & TableName & "")
+
+        'For row As Integer = 1 To DT.Rows.Count - 1
+        'For column As Integer = 0 To DT.Columns.Count - 1
+        'Console.WriteLine(DT.Rows(row).Item(column))
+        'Next column
+        'Next row
+
         Dim DA As SqlClient.SqlDataAdapter = New SqlClient.SqlDataAdapter(SQL)
         DA.SelectCommand.Connection = Conn
         Dim CMD As SqlClient.SqlCommandBuilder = New SqlClient.SqlCommandBuilder(DA)
