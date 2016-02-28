@@ -31,6 +31,7 @@ ENHANCEMENT-Something that will be added to the features of an already existing 
 
 PROJECT GUIDELINES
 
+Please work on the DEVELOPMENT BRANCH of the project. The master branch is not to be used for ANY reason.
 OOP guidelines are to be followed at all times.
 Code is to be kept organized within classes so things don't get cluttered. Skeleton code will be coming shortly to outline the 
 various classes with Docstring notation to give further description.
