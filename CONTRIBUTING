@@ -38,10 +38,11 @@ various classes with Docstring notation to give further description.
 
 Currently I have a working model of an NFL scheduler which follows all rules, SQL Server 2014 Databases that hold various 
 tables(players, coaches, team data, Play by Play data, stored procedures, etc), a Play by Play parser that parses Play By Play logs
-and sorts out the various pertinent information and sticks it in an SQL Database so stored procedures can be ran to pull out statistical
-data for the stat/game engine to be built around using actual real NFL data, an in depth player, coach, GM, scout, owner creator 
-which then stores the information in an SQL database, and the beinnings of the stat engine.
+and sorts out the various pertinent information and sticks it in an SQL Database so stored procedures can be ran to pull out statistical data for the stat/game engine to be built around using actual real NFL data, an in depth player, coach, GM, scout, owner creator which then stores the information in an SQL database, and the beinnings of the stat engine.
 
 ALL code changes should be made to the Development Branch of the code and then submitted for review before they get added.  
 Also, please update me as to what is being worked on so we do not have overlapping responsibilities or more than one person working
 on the same thing, thereby wasting resources that could be used for something else.
+
+We are focused on code re-use when designing things. For instance, Roster cuts, Free Agent signings and Drafting players all are related to things the AI has to make decisions on. We don't want to have to design 3 seperate modules for each, we ar going to want 70-80% of the code to be able to be reused for each part and then the other 20-30% will be specific to each part of it.
+
