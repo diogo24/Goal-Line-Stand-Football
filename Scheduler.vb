@@ -3,6 +3,11 @@ Imports System.IO
 Public Class Scheduler
     Dim HomeTeam As New Collection
     Dim AwayTeam As New Collection
+    Dim HomeTeamCopy As New Collection
+    Dim AwayTeamCopy As New Collection
+    Dim DoOnce As Boolean
+    Dim SW As StreamWriter
+    Dim AlreadyPlayed(32) As Integer
     Dim ScheduleH(17, 16) As Integer
     Dim ScheduleA(17, 16) As Integer
     Dim HadToExitSub As Boolean
@@ -12,100 +17,166 @@ Public Class Scheduler
     Dim StartedOver As Integer
     Dim TeamsLeftToPlay As New Collection
     Dim RedoGame As Boolean
+    Dim ConHGames(32) As Integer 'tracks the number of Consecutive Home Games a team has played
+    Dim ConAGames(32) As Integer 'tracks the number of Consecutive AWay Games a team has played
+    Dim LastDivGamePlayed(32) As Integer 'checks the last division game played for each team.   
+
     ''' <summary>
-    ''' Creates a schedule following all appropriate NFL Rules
+    ''' Creates a schedule following all appropriate NFL Rules.  No more than 3 consecutive home or away games.  Teams may not play each other in consecutive weeks
+    ''' CHECKS:
+    ''' 1) If the game is a divisional game---ensure the same teams didn't play the week before
+    ''' 2) Can every team play a game this week if this game gets scheduled---if yes, continue, if no, redo the weekly schedule.
+    ''' 3) If over 60 attempts are made and a weekly schedule still cannot be made---restart entire schedule over again
+    ''' 4) 
     ''' </summary>
     ''' <param name="NumGames"></param>
     Public Sub GetSchedule(ByVal NumGames As Integer)
-        Dim SW As StreamWriter
-        SW = New StreamWriter("Schedule.txt")
+        If DoOnce = False Then 'first time through the scheduler
 
-        Dim SQLString As String = "TeamID int Not NULL, DivID int NOT NULL, ConfID int NOT NULL, TeamFName varchar(20) NOT NULL, TeamLName varchar(20) NOT NULL, LastYearFinish int NOT NULL, DivOutConfID int NOT NULL, DivInConfID int NOT NULL, LYFinishHGSched int NOT NULL, TeamNick char(10) NOT NULL CONSTRAINT Team_ID PRIMARY KEY(TeamID)"
-        GetTables.CreateTable(CityInfo, "CityInfo", SQLString)
-        GetTables.LoadTable(CityInfo, "CityInfo")
+            SW = New StreamWriter("Schedule.txt")
 
-        For i As Integer = 1 To CityInfo.Rows.Count 'fills the DT with the Database information
-            InitTeams(i).TeamId = CityInfo.Rows(i - 1).Item("TeamID")
-            InitTeams(i).DivID = CityInfo.Rows(i - 1).Item("DivID")
-            InitTeams(i).ConfID = CityInfo.Rows(i - 1).Item("ConfID")
-            InitTeams(i).TeamFName = CityInfo.Rows(i - 1).Item("TeamFName").ToString.Trim
-            InitTeams(i).TeamLName = CityInfo.Rows(i - 1).Item("TeamLName").ToString.Trim
-            InitTeams(i).DivFinishLastYear = CityInfo.Rows(i - 1).Item("LastYearFinish")
-            InitTeams(i).DivOutConfID = CityInfo.Rows(i - 1).Item("DivOutConfID")
-            InitTeams(i).DivInConfID = CityInfo.Rows(i - 1).Item("DivInConfID")
-            InitTeams(i).LYFinishHGSched = CityInfo.Rows(i - 1).Item("LYFinishHGSched")
-            InitTeams(i).TeamNick = CityInfo.Rows(i - 1).Item("TeamNick")
-        Next i
+            Dim SQLString As String = "TeamID int Not NULL, DivID int NOT NULL, ConfID int NOT NULL, TeamFName varchar(20) NOT NULL, TeamLName varchar(20) NOT NULL, LastYearFinish int NOT NULL, DivOutConfID int NOT NULL, DivInConfID int NOT NULL, LYFinishHGSched int NOT NULL, TeamNick char(10) NOT NULL CONSTRAINT Team_ID PRIMARY KEY(TeamID)"
+            GetTables.CreateTable(CityInfo, "CityInfo", SQLString)
+            GetTables.LoadTable(CityInfo, "CityInfo")
 
-        ScheduleDivGames() 'schedules divisional games for each teams
-        ScheduleInConfGames() 'schedules games against the one non-divisional in the same conference here you play all teams
-        OutofConfGames() 'schedules the Out of conference games for each team
-        InConfFinish() 'schedules the 2 games each team plays against the same place finisher of the other 2 divisions you don't play all the teams in
-        GetByeWeek() 'Schdules Bye Weeks for teams
+            For i As Integer = 1 To CityInfo.Rows.Count 'fills the DT with the Database information
+                InitTeams(i).TeamId = CityInfo.Rows(i - 1).Item("TeamID")
+                InitTeams(i).DivID = CityInfo.Rows(i - 1).Item("DivID")
+                InitTeams(i).ConfID = CityInfo.Rows(i - 1).Item("ConfID")
+                InitTeams(i).TeamFName = CityInfo.Rows(i - 1).Item("TeamFName").ToString.Trim
+                InitTeams(i).TeamLName = CityInfo.Rows(i - 1).Item("TeamLName").ToString.Trim
+                InitTeams(i).DivFinishLastYear = CityInfo.Rows(i - 1).Item("LastYearFinish")
+                InitTeams(i).DivOutConfID = CityInfo.Rows(i - 1).Item("DivOutConfID")
+                InitTeams(i).DivInConfID = CityInfo.Rows(i - 1).Item("DivInConfID")
+                InitTeams(i).LYFinishHGSched = CityInfo.Rows(i - 1).Item("LYFinishHGSched")
+                InitTeams(i).TeamNick = CityInfo.Rows(i - 1).Item("TeamNick")
+            Next i
 
+            ScheduleDivGames() 'schedules divisional games for each teams
+            ScheduleInConfGames() 'schedules games against the one non-divisional in the same conference here you play all teams
+            OutofConfGames() 'schedules the Out of conference games for each team
+            InConfFinish() 'schedules the 2 games each team plays against the same place finisher of the other 2 divisions you don't play all the teams in
+            GetByeWeek() 'Schdules Bye Weeks for teams
+            DoOnce = True
+
+            For i As Integer = 1 To HomeTeam.Count 'copies the list of games to a backup in case it needs to be restored if games cannot be played.
+                HomeTeamCopy.Add(HomeTeam(i))
+                AwayTeamCopy.Add(AwayTeam(i))
+            Next i
+        End If
 
         For i As Integer = 1 To 32
             'Console.WriteLine("Team " & i & " " & InitTeams(i).TeamFName & "")
         Next
         Dim TeamsOnBye As String = ""
-        For i As Integer = 1 To 15 'sets the schedule to 15 games since the last 2 divisional games have already been scheduled
+        For i As Integer = 1 To 17 'sets the schedule to 15 games since the last 2 divisional games have already been scheduled
             Dim countbye As Integer
 
-            countbye = 0
-            For checkbye As Integer = 1 To 32
-                If InitTeams(checkbye).ByeWeek = i Then
-                    TeamsOnBye += InitTeams(checkbye).TeamNick & ", "
-                    countbye += 1
-                End If
-            Next checkbye
-            CreateWeeklySchedule(i, countbye)
+            If i < 16 Then
 
-            Do While GameH.Count = 0
-                CreateWeeklySchedule(i, countbye)
-            Loop
-
-            Console.WriteLine("-----------------------------")
-            Console.WriteLine("Week " & i & " schedule")
-            Console.WriteLine("-----------------------------")
-
-            SW.WriteLine("-----------------------") 'sends output to file
-            SW.WriteLine("WEEK " & i & " SCHEDULE")
-            SW.WriteLine("-----------------------")
-
-            If TeamsOnBye <> "" Then 'Only runs if teams have a ByeWeek
-                Console.WriteLine("Teams On Bye: " & TeamsOnBye.Trim)
-                SW.WriteLine("Teams On Bye: " & TeamsOnBye.Trim)
-            End If
-
-            TeamsOnBye = ""
-
-            For X As Integer = 1 To GameH.Count
-                ScheduleH(i, X) = GameH.Item(X)
-                ScheduleA(i, X) = GameA.Item(X)
-                Console.WriteLine("" & InitTeams(GameH.Item(X)).TeamNick & "(" & GameH.Item(X) & ") vs. " & InitTeams(GameA.Item(X)).TeamNick & "(" & GameA.Item(X) & ")")
-                SW.WriteLine("" & InitTeams(GameH.Item(X)).TeamNick & "(" & GameH.Item(X) & ") vs. " & InitTeams(GameA.Item(X)).TeamNick & "(" & GameA.Item(X) & ")")
-            Next X
-
-            'verification only 1 team per week
-            For teamcheck As Integer = 1 To 32
-                For x As Integer = 1 To GameH.Count
-                    Dim countdup As Integer
-                    countdup = 0
-                    If teamcheck = GameH.Item(x) Or GameA.Item(x) Then
-                        countdup += 1
-                        If countdup > 1 Then
-                            Console.WriteLine("Team " & teamcheck & " Is playing more than 1 game In week " & i & "")
-                        End If
+                countbye = 0
+                For checkbye As Integer = 1 To 32
+                    If InitTeams(checkbye).ByeWeek = i Then
+                        TeamsOnBye += InitTeams(checkbye).TeamNick & ", "
+                        countbye += 1
                     End If
-                Next x
-            Next teamcheck
+                Next checkbye
+                CreateWeeklySchedule(i, countbye)
 
-            GameH.Clear() 'clears this weeks slate of games
-            GameA.Clear() 'clears this weeks slate of games
-            SW.Flush() 'flushes the buffer to prevent truncated outputs
+                Do While GameH.Count = 0
+                    CreateWeeklySchedule(i, countbye)
+                Loop
+
+                Console.WriteLine("-----------------------------")
+                Console.WriteLine("Week " & i & " schedule")
+                Console.WriteLine("-----------------------------")
+
+                SW.WriteLine("-----------------------") 'sends output to file
+                SW.WriteLine("WEEK " & i & " SCHEDULE")
+                SW.WriteLine("-----------------------")
+
+                If TeamsOnBye <> "" Then 'Only runs if teams have a ByeWeek
+                    Console.WriteLine("Teams On Bye: " & TeamsOnBye.Trim)
+                    SW.WriteLine("Teams On Bye: " & TeamsOnBye.Trim)
+                End If
+
+                TeamsOnBye = ""
+
+                For X As Integer = 1 To GameH.Count
+
+                    If InitTeams(GameH.Item(X)).DivID = InitTeams(GameA.Item(X)).DivID Then 'is this a divisional game being scheduled?
+
+                        If LastDivGamePlayed(GameH.Item(X)) = LastDivGamePlayed(GameA.Item(X)) And LastDivGamePlayed(GameH.Item(X)) <> 0 Then 'these two team played the week before---restart the schedule for week
+                            Console.WriteLine("The same teams are playing 2 weeks in a row!!")
+                            '####TO DO Re-write Schedule re-start algorithm to a seperate Sub so it can be called by multiple places
+                        Else 'Schedule the game and update LastGamePlayed to the proper team
+                            LastDivGamePlayed(GameH.Item(X)) = GameA.Item(X)
+                            LastDivGamePlayed(GameA.Item(X)) = GameH.Item(X)
+                        End If
+                    Else 'Not A Divisional Game, so set LastDivGamePlayed to 0
+                        LastDivGamePlayed(GameH.Item(X)) = 0
+                        LastDivGamePlayed(GameA.Item(X)) = 0
+                    End If
+
+                    ScheduleH(i, X) = GameH.Item(X)
+                    ScheduleA(i, X) = GameA.Item(X)
+                    Console.WriteLine("" & InitTeams(GameH.Item(X)).TeamNick & "(" & GameH.Item(X) & ") vs. " & InitTeams(GameA.Item(X)).TeamNick & "(" & GameA.Item(X) & ")")
+                    SW.WriteLine("" & InitTeams(GameH.Item(X)).TeamNick & "(" & GameH.Item(X) & ") vs. " & InitTeams(GameA.Item(X)).TeamNick & "(" & GameA.Item(X) & ")")
+                    ConHGames(GameH.Item(X)) += 1 'Adds a home game to the consecutive home games count
+                    ConAGames(GameH.Item(X)) = 0 'resets consecutive away games to 0
+                    ConAGames(GameA.Item(X)) += 1 'Adds an away game to the consecutive away games count
+                    ConHGames(GameA.Item(X)) = 0 'resets consecutive home games to 0
+
+                    Console.WriteLine("Con Home Games: " & ConHGames(GameH.Item(X)) & " Cons Away Games: " & ConAGames(GameA.Item(X)))
+                    AlreadyPlayed(GameH.Item(X)) = 0
+                    AlreadyPlayed(GameA.Item(X)) = 0
+
+                Next X
+
+
+                'verification only 1 team per week
+                For teamcheck As Integer = 1 To 32
+                    Dim countdup As Integer = 0
+                    AlreadyPlayed(teamcheck) = 0
+                    For x As Integer = 1 To GameH.Count
+                        If teamcheck = GameH.Item(x) Or GameA.Item(x) Then
+                            countdup += 1
+                            If countdup > 1 Then
+                                Console.WriteLine("Team " & teamcheck & " Is playing more than 1 game In week " & i & "")
+                            End If
+                        End If
+                        countdup = 0
+                    Next x
+                Next teamcheck
+
+                GameH.Clear() 'clears this weeks slate of games
+                GameA.Clear() 'clears this weeks slate of games
+                SW.Flush() 'flushes the buffer to prevent truncated outputs
+
+
+            ElseIf i = 16 Or 17 Then
+
+                Console.WriteLine("-----------------------------")
+                Console.WriteLine("Week " & i & " schedule")
+                Console.WriteLine("-----------------------------")
+
+                SW.WriteLine("-----------------------") 'sends output to file
+                SW.WriteLine("WEEK " & i & " SCHEDULE")
+                SW.WriteLine("-----------------------")
+
+                For X As Integer = 1 To 16
+                    Console.WriteLine("" & InitTeams(ScheduleH(i, X)).TeamNick & "(" & ScheduleH(i, X) & ") vs. " & InitTeams(ScheduleA(i, X)).TeamNick & "(" & ScheduleA(i, X) & ")")
+                    SW.WriteLine("" & InitTeams(ScheduleH(i, X)).TeamNick & "(" & ScheduleH(i, X) & ") vs. " & InitTeams(ScheduleA(i, X)).TeamNick & "(" & ScheduleA(i, X) & ")")
+                    'Console.WriteLine("Con Home Games: " & ConHGames(GameH.Item(X)) & " Cons Away Games: " & ConAGames(GameA.Item(X)))
+                Next X
+
+            End If
+            SW.Flush()
         Next i
 
+
     End Sub
+
     Public Structure Teams
         Dim TeamId As Integer
         Dim TeamFName As String
@@ -121,6 +192,8 @@ Public Class Scheduler
         Dim LYFinishHGSched As Integer
         Dim LYFinishAGSched As Integer
         Dim TeamNick As String
+        Dim HomeGames As List(Of Integer)
+        Dim AwayGames As List(Of Integer)
     End Structure
     ''' <summary>
     ''' Schedules 1 Home and 1 Away game against each team in the same division
@@ -138,6 +211,7 @@ Public Class Scheduler
                 End If
                 i += 1
             Loop
+
             HomeTeam.Add(Div1.Item(1)) 'adds 3 homes games for team
             HomeTeam.Add(Div1.Item(1))
             HomeTeam.Add(Div1.Item(1))
@@ -162,10 +236,8 @@ Public Class Scheduler
             AwayTeam.Add(Div1.Item(1))
             AwayTeam.Add(Div1.Item(2))
             AwayTeam.Add(Div1.Item(3))
-            'Teams.Add(1)
 
-            EndWithDivisionGames(Div1.Item(1), Div1.Item(2), Div1.Item(3), Div1.Item(4), Teams)
-
+            EndWithDivisionGames(Div1.Item(1), Div1.Item(2), Div1.Item(3), Div1.Item(4), 4)
 
             Div1.Clear()
             i = 0
@@ -442,347 +514,643 @@ Public Class Scheduler
             AwayTeam.Add(ATeam.Item(i))
         Next i
     End Sub
-    Private Sub CreateWeeklySchedule(ByVal WeekNum As Integer, ByVal NumByeTeams As Integer)
-        'runs through the weekly schedule
-        Dim count As Integer
-        Dim Team As Integer = 1
-        HadToExitSub = False
 
-        count = 1
-        For games As Integer = 1 To (16 - (NumByeTeams / 2))
-            'schedules the games for the week
+    Private Sub CreateWeeklySchedule(ByVal WeekNum As Integer, ByVal NumByeTeams As Integer) 'rewritten sub
+        'rewrote 64 lines into 32
 
-            Dim PickGameNum As Integer
-            PickGameNum = MT.GenerateInt32(1, HomeTeam.Count) 'picks a random game to schedule
+        Static count As Integer = 0
+        Static NumRestarts As Integer = 0
+        Dim Gamecheck As Boolean
+        Dim hometeamValue As Integer
+        Dim awayteamValue As Integer
+        Dim GameNum As Integer
+        Dim PickGame As Integer
+        Dim games As Integer = 0
+        Dim IsHomeTeam As Boolean
 
+        For i As Integer = 1 To 32 'sets bye teams as unable to play this week
+            If InitTeams(i).ByeWeek = WeekNum Then
+                AlreadyPlayed(i) = 1
+            End If
+            InitTeams(i).HomeGames = New List(Of Integer)
+            InitTeams(i).AwayGames = New List(Of Integer)
 
-            For i As Integer = 1 To 32
-                If InitTeams(i).ByeWeek = WeekNum And (InitTeams(i).TeamId = HomeTeam.Item(PickGameNum) Or _
-                InitTeams(i).TeamId = AwayTeam.Item(PickGameNum)) Then
-                    PickGameNum = MT.GenerateInt32(1, HomeTeam.Count)
-                    i = 0
+            For team As Integer = 1 To HomeTeam.Count
+                If i = HomeTeam.Item(team) Then
+                    InitTeams(i).HomeGames.Add(AwayTeam.Item(team)) 'adds home games to this teams list
+                ElseIf i = AwayTeam.Item(team) Then
+                    InitTeams(i).AwayGames.Add(HomeTeam.Item(team))
                 End If
-            Next i
+            Next team
+        Next i
 
-            If GameH.Count > 0 Then 'runs if there has been a game scheduled already this week
-                CanGameBePlayed(WeekNum, games) 'checks to see if every team has at least 1 game that can be played
+        While games < (16 - (NumByeTeams / 2)) 'schedules this wekeks games ###Might want to change this to a While Loop---While games <> (16-(NumByeTeams/2))
 
-                If RedoGame = True Then 'redogame is a boolean flag meaning it restarted the weekly schedule
-                    If StartedOver > 30 Then
-                        games = 1
-                        RedoGame = False
-                        StartedOver = 0
-                    Else
-                        games -= 1
-                        RedoGame = False
+            For team As Integer = 1 To 32 'go through each team and select a game from their schedule
+
+                While AlreadyPlayed(team) <> 1 'skips this team if it already has played
+
+                    If InitTeams(team).AwayGames.Count <> 0 And InitTeams(team).HomeGames.Count <> 0 Then 'has home and away games available to choose from
+                        IsHomeTeam = MT.GenerateInt32(0, 1)
+                        Select Case IsHomeTeam
+                            Case 0 'randomly choose home game
+                                PickGame = MT.GenerateInt32(0, InitTeams(team).HomeGames.Count - 1)
+                                hometeamValue = team
+                                awayteamValue = InitTeams(team).HomeGames.Item(PickGame)
+                            Case 1 'randomly chose away game
+                                PickGame = MT.GenerateInt32(0, InitTeams(team).AwayGames.Count - 1)
+                                awayteamValue = team
+                                hometeamValue = InitTeams(team).AwayGames.Item(PickGame)
+                        End Select
+
+                    ElseIf InitTeams(team).AwayGames.Count = 0 Then 'must choose home game
+                        PickGame = MT.GenerateInt32(0, InitTeams(team).HomeGames.Count - 1)
+                        hometeamValue = team
+                        awayteamValue = InitTeams(team).HomeGames.Item(PickGame)
+
+                    ElseIf InitTeams(team).HomeGames.Count = 0 Then 'must choose away game
+                        PickGame = MT.GenerateInt32(0, InitTeams(team).AwayGames.Count - 1)
+                        awayteamValue = team
+                        hometeamValue = InitTeams(team).AwayGames.Item(PickGame)
                     End If
-                End If
-                If games <= (16 - (NumByeTeams / 2)) Then
-                    count = 1
-                    For teamid As Integer = 1 To GameH.Count
-                        'ensures only a game that actually can be played is chosen
-                        Do While HomeTeam.Item(PickGameNum) = GameH.Item(teamid) Or HomeTeam.Item(PickGameNum) = _
-                        GameA.Item(teamid) Or AwayTeam.Item(PickGameNum) = GameH.Item(teamid) Or _
-                        AwayTeam.Item(PickGameNum) = GameA.Item(teamid) Or InitTeams(HomeTeam.Item(PickGameNum)).ByeWeek = WeekNum Or _
-                        InitTeams(AwayTeam.Item(PickGameNum)).ByeWeek = WeekNum
-                            PickGameNum = MT.GenerateInt32(1, HomeTeam.Count)
-                            teamid = 1
-                            count += 1
-                            If count > 1750 Then
-                                For i As Integer = 1 To GameH.Count
-                                    HomeTeam.Add(GameH.Item(i))
-                                    AwayTeam.Add(GameA.Item(i))
-                                Next i
-                                GameH.Clear()
-                                GameA.Clear()
-                                Exit Sub
-                            End If
-                        Loop
-                    Next teamid
 
-                End If
-            End If
-            If count > 1750 Then
-                count = 0
-                Team = 1
-            Else
-                GameH.Add(HomeTeam.Item(PickGameNum))
-                GameA.Add(AwayTeam.Item(PickGameNum))
-                HomeTeam.Remove(PickGameNum)
-                AwayTeam.Remove(PickGameNum)
-            End If
-        Next games
+                    Gamecheck = CanGameBePlayed(WeekNum, GameNum, hometeamValue, awayteamValue)
+
+                    While AlreadyPlayed(hometeamValue) = 1 Or AlreadyPlayed(awayteamValue) = 1 Or Gamecheck = False Or
+                     LastDivGamePlayed(hometeamValue) = awayteamValue Or ConAGames(awayteamValue) = 3 Or ConHGames(hometeamValue) = 3 Or hometeamValue = awayteamValue
+                        'rechooses game if team has played 3 games in a row home or away, team is on a bye this week, has already been chosen for a game, just played the same team the previosu week, 
+                        'or if all other teams cannot play a game
+
+                        If ConAGames(team) = 3 Or InitTeams(team).AwayGames.Count = 0 Then 'must choose a home game
+                            PickGame = MT.GenerateInt32(0, InitTeams(team).HomeGames.Count - 1)
+                            While ConAGames(InitTeams(team).HomeGames.Item(PickGame)) = 3 'if opponent has played more than 3 consecutive away games have to repick
+                                PickGame = MT.GenerateInt32(0, InitTeams(team).HomeGames.Count - 1)
+                            End While
+                            hometeamValue = team
+                            awayteamValue = InitTeams(team).HomeGames.Item(PickGame)
+
+                        ElseIf ConHGames(team) = 3 Or InitTeams(team).HomeGames.Count = 0 Then 'must choose an away game
+                            PickGame = MT.GenerateInt32(0, InitTeams(team).AwayGames.Count - 1)
+                            While ConHGames(InitTeams(team).AwayGames.Item(PickGame)) = 3 'if opponent has played more than 3 consecutive away games have to repick
+                                PickGame = MT.GenerateInt32(0, InitTeams(team).AwayGames.Count - 1)
+                            End While
+                            awayteamValue = team
+                            hometeamValue = InitTeams(team).AwayGames.Item(PickGame)
+                        Else 'doesn't matter
+
+                            IsHomeTeam = MT.GenerateInt32(0, 1)
+                            Select Case IsHomeTeam
+                                Case 0  'randomly choose home game
+                                    PickGame = MT.GenerateInt32(0, InitTeams(team).HomeGames.Count - 1)
+                                    hometeamValue = team
+                                    awayteamValue = InitTeams(team).HomeGames.Item(PickGame)
+                                Case 1 'randomly chose away game
+                                    PickGame = MT.GenerateInt32(0, InitTeams(team).AwayGames.Count - 1)
+                                    awayteamValue = team
+                                    hometeamValue = InitTeams(team).AwayGames.Item(PickGame)
+                            End Select
+                        End If
+
+                        GameNum = (16 - (NumByeTeams / 2))
+                        Gamecheck = CanGameBePlayed(WeekNum, GameNum, hometeamValue, awayteamValue)
+
+                        count += 1
+
+                        If GameH.Count = (16 - NumByeTeams / 2) Then 'full games are scheduled
+                            count = 0
+                            Exit While
+                        End If
+
+                        If count >= 500 Then  'restart entire week, too many attempts
+
+                            For i As Integer = 1 To 32
+                                For game As Integer = 1 To GameH.Count
+                                    InitTeams(i).HomeGames.Add(GameH.Item(game)) 'puts the games back in the list
+                                    InitTeams(i).AwayGames.Add(GameA.Item(game))
+                                    If InitTeams(i).ByeWeek = WeekNum Then
+                                        AlreadyPlayed(i) = 1
+                                    Else
+                                        AlreadyPlayed(i) = 0
+                                    End If
+                                Next game
+                            Next i
+                            GameH.Clear()
+                            GameA.Clear()
+                            games = 0 'resets the count to 1
+                            NumRestarts += 1
+                            count = 0
+                        End If
+                        If NumRestarts = 50 Then
+                            Exit For
+                        End If
+                    End While
+
+                    If GameH.Count = (16 - NumByeTeams / 2) Then
+                        Exit While
+                    End If
+
+                    If (count < 500 And NumRestarts < 50) And GameH.Count < (16 - NumByeTeams / 2) Then 'And AlreadyPlayed(hometeamValue) <> 1 And AlreadyPlayed(awayteamValue) <> 1 Then 'only schedule this if all the games are in it
+                        If IsHomeTeam = True Then 'the team is the home team
+                            GameH.Add(hometeamValue)
+                            GameA.Add(awayteamValue)
+                            InitTeams(team).HomeGames.Remove(awayteamValue)
+                            InitTeams(team).AwayGames.Remove(hometeamValue)
+
+                        ElseIf IsHomeTeam = False Then 'team is the away team
+                            GameA.Add(awayteamValue)
+                            GameH.Add(hometeamValue)
+                            InitTeams(team).AwayGames.Remove(awayteamValue)
+                            InitTeams(team).HomeGames.Remove(hometeamValue)
+                        End If
+                        count = 0 'resets the count for the next game
+                        games += 1 'increments the game count
+                        AlreadyPlayed(hometeamValue) = 1
+                        AlreadyPlayed(awayteamValue) = 1
+                    End If
+                End While
+            Next team
+        End While
+
+        If NumRestarts = 50 Then 'restart the entire schedule from week 1
+            count = 0
+            NumRestarts = 0 'reset the restart count
+            GameH.Clear() 'clears the list of games this week
+            GameA.Clear()
+            HomeTeam.Clear() 'clears the list of games left to be scheduled
+            AwayTeam.Clear()
+
+
+            For i As Integer = 1 To HomeTeamCopy.Count 'adds the original games to be scheduled back in
+                HomeTeam.Add(HomeTeamCopy(i))
+                AwayTeam.Add(AwayTeamCopy(i))
+            Next i
+            For i As Integer = 1 To 32
+                AlreadyPlayed(i) = 0
+                ConHGames(i) = 0
+                ConAGames(i) = 0
+                LastDivGamePlayed(i) = 0
+                InitTeams(i).AwayGames.Clear()
+                InitTeams(i).HomeGames.Clear()
+            Next i
+            GetSchedule(16)
+        End If
 
     End Sub
+
+    Private Sub CreateWeekSchedule(ByVal WeekNum As Integer, ByVal NumByeTeams As Integer)
+        'runs through the weekly schedule
+
+        'Dim count As Integer
+        'Dim Team As Integer = 1
+        'HadToExitSub = False
+
+        'count = 1
+        'For games As Integer = 1 To (16 - (NumByeTeams / 2))
+        'schedules the games for the week
+
+        'Dim PickGameNum As Integer
+        'PickGameNum = MT.GenerateInt32(1, HomeTeam.Count) 'picks a random game to schedule
+
+        'If WeekNum > 3 Then 'a team cannot play 3 games before week 3
+        'While ConHGames(HomeTeam.Item(PickGameNum)) = 3 Or ConAGames(AwayTeam.Item(PickGameNum)) = 3
+        ''(HomeTeam.Item(PickGameNum) = ScheduleA(WeekNum - 1, HomeTeam.Item(PickGameNum)) And AwayTeam.Item(PickGameNum) = ScheduleH(WeekNum - 1, AwayTeam.Item(PickGameNum)))
+        'PickGameNum = MT.GenerateInt32(1, HomeTeam.Count)
+        'End While
+        'End If
+
+        'For i As Integer = 1 To 32
+        'If InitTeams(i).ByeWeek = WeekNum And (InitTeams(i).TeamId = HomeTeam.Item(PickGameNum) Or
+        'InitTeams(i).TeamId = AwayTeam.Item(PickGameNum)) Then 'if a team is on a bye week and it is chosen for a game---rechoose a game.
+        'PickGameNum = MT.GenerateInt32(1, HomeTeam.Count)
+        'i = 0
+        'End If
+        'Next i
+
+        'If GameH.Count > 0 Then 'runs if there has been a game scheduled already this week
+        'CanGameBePlayed(WeekNum, games) 'checks to see if every team has at least 1 game that can be played
+
+        'If RedoGame = True Then 'redogame is a boolean flag meaning it restarted the weekly schedule
+        'If StartedOver > 30 Then
+        'games = 1
+        'RedoGame = False
+        'StartedOver = 0
+        'Else
+        'games -= 1
+        'RedoGame = False
+        'End If
+        'End If
+        'If games <= (16 - (NumByeTeams / 2)) And WeekNum > 1 Then
+        'count = 1
+        'For teamid As Integer = 1 To GameH.Count
+        'ensures only a game that actually can be played is chosen
+        'Do While HomeTeam.Item(PickGameNum) = GameH.Item(teamid) Or HomeTeam.Item(PickGameNum) =
+        'GameA.Item(teamid) Or AwayTeam.Item(PickGameNum) = GameH.Item(teamid) Or
+        'AwayTeam.Item(PickGameNum) = GameA.Item(teamid) Or InitTeams(HomeTeam.Item(PickGameNum)).ByeWeek = WeekNum Or
+        'InitTeams(AwayTeam.Item(PickGameNum)).ByeWeek = WeekNum Or ConHGames(HomeTeam.Item(PickGameNum)) = 3 Or ConAGames(AwayTeam.Item(PickGameNum)) = 3
+        '(HomeTeam.Item(PickGameNum) = ScheduleA(WeekNum - 1, HomeTeam.Item(PickGameNum)) And AwayTeam.Item(PickGameNum) = ScheduleH(WeekNum - 1, AwayTeam.Item(PickGameNum)))
+
+        'PickGameNum = MT.GenerateInt32(1, HomeTeam.Count)
+        'teamid = 1
+        'count += 1
+        'If count > 500 Then 'puts the games back in the scheduler
+        'For i As Integer = 1 To GameH.Count
+        'HomeTeam.Add(GameH.Item(i))
+        'AwayTeam.Add(GameA.Item(i))
+        'Next i
+        'GameH.Clear()
+        'GameA.Clear()
+        'Exit Sub
+        'End If
+        'Loop
+        'Next teamid
+
+        'End If
+        'End If
+        ' If count > 500 Then
+        'count = 0
+        'Team = 1
+        'Else
+        'GameH.Add(HomeTeam.Item(PickGameNum))
+        'GameA.Add(AwayTeam.Item(PickGameNum))
+        'HomeTeam.Remove(PickGameNum)
+        'AwayTeam.Remove(PickGameNum)
+        'End If
+        'Next games
+
+    End Sub 'unused function
     '''<summary>creates a schedule where the last 2 games in the season are divisional games. 
     '''currently in the NFL the last 2 games each teams play every year are games within
     '''the division. Takes the 4 Div teams from ScheduleDivGames and then schedules 2 games checking 
     '''to make sure they both can be played and are not both the same game</summary>
-    Private Function EndWithDivisionGames(ByVal Team1 As Integer, ByVal Team2 As Integer, ByVal Team3 As Integer, ByVal Team4 As Integer, ByVal Teams As Collection) As Collection
+    Private Sub EndWithDivisionGames(ByVal Team1 As Integer, ByVal Team2 As Integer, ByVal Team3 As Integer, ByVal Team4 As Integer, ByVal NumTeams As Integer)
 
-        Teams.Add(Team1)
-        Teams.Add(Team2)
-        Teams.Add(Team3)
-        Teams.Add(Team4)
+        Dim MyTeams As New List(Of Integer)
+        MyTeams.Clear()
+        Myteams.Add(Team1)
+        MyTeams.Add(Team2)
+        MyTeams.Add(Team3)
+        MyTeams.Add(Team4)
 
-        Dim HTeam As New Collection
-        Dim ATeam As New Collection
         Dim PickHome As Integer
         Dim PickHome2 As Integer
         Dim PickAway As Integer
         Dim PickAway2 As Integer
 
-        'schedules the games
-        PickHome = MT.GenerateInt32(1, Teams.Count) 'randomly chooses the home team
-        PickHome2 = PickHome 'temp stores the integer for easy removal from the list
-        PickHome = Teams.Item(PickHome)
-        Teams.Remove(PickHome2) 'removes this team from the list
+        PickHome = MyTeams.Item(MT.GenerateInt32(0, MyTeams.Count - 1)) 'chooses 1st home team
+        MyTeams.Remove(PickHome)
+        PickHome2 = MyTeams.Item(MT.GenerateInt32(0, MyTeams.Count - 1)) 'chooses 2nd home team, only 3 teams are left in the list
+        While PickHome = PickHome2 'if these teams are the same team, then it re-chooses
+            PickHome2 = MyTeams.Item(MT.GenerateInt32(0, MyTeams.Count - 1))
+        End While
+        MyTeams.Remove(PickHome2)
 
-        PickAway = MT.GenerateInt32(1, Teams.Count) 'randomly chooses the away team from the remaining teams
-        PickAway2 = PickAway
-        PickAway = Teams.Item(PickAway)
-        Teams.Remove(PickAway2)
-        Console.WriteLine("Team " & PickHome & " vs. " & PickAway)
-        HTeam.Add(PickHome)
-        ATeam.Add(PickAway)
+        Select Case MT.GenerateInt32(0, MyTeams.Count - 1) 'randomly decides which will be away team 1 and away team 2
+            Case 0
+                PickAway = MyTeams(1)
+                MyTeams.Remove(PickAway)
+                PickAway2 = MyTeams(0) 'must be the last remaining away team
+            Case 1
+                PickAway2 = MyTeams(1)
+                MyTeams.Remove(PickAway2)
+                PickAway = MyTeams(0)
+                MyTeams.Remove(0)
+        End Select
 
-        PickHome = MT.GenerateInt32(1, Teams.Count) 'Now need to randomly make one of the reamining teams the home team
-        PickHome2 = PickHome
-        PickHome = Teams.Item(PickHome)
-        Teams.Remove(PickHome2)
-        PickAway = Teams.Item(1) 'only team left in the list
-        Teams.Clear() 'removes last team
-        Console.WriteLine("Team " & PickHome & " vs. " & PickAway)
-        HTeam.Add(PickHome)
-        ATeam.Add(PickAway) 'Schedules the first games
-        '---------------------------------------------------------------------------------Scheduling the 2nd games------------------------------
+        ScheduleH(16, (Team4 / 2) - 1) = PickHome 'game 1
+        ScheduleA(16, (Team4 / 2) - 1) = PickAway
+        ScheduleH(16, (Team4 / 2)) = PickHome2 'game 2
+        ScheduleA(16, (Team4 / 2)) = PickAway2
 
-        Teams.Add(ATeam.Item(1)) 'adds the away teams back in to schedule the second divisional game---these teams MUST be the home team now!
-        Teams.Add(ATeam.Item(2))
+        'PickHome and Pickaway cannot play each other again the following week, PickHome and PickHome2 cannot play each other since they both need to be away teams the following week, 
+        'And a team cannot play itself, so that leaves only one option---PickHome must play at PickAway2 and PickHome2 must play at PickAway.
 
-        PickAway = MT.GenerateInt32(1, HTeam.Count) 'chooses an away team from the teams that were the home team previously
-        PickAway2 = PickAway
-        PickAway = HTeam.Item(PickAway) 'takes a home team from the previous week and makes it an away team this week
-        Teams.Remove(PickAway2) 'removes this team from the list
+        ScheduleH(17, (Team4 / 2) - 1) = PickAway2 'game 1
+        ScheduleA(17, (Team4 / 2) - 1) = PickHome
+        ScheduleH(17, (Team4 / 2)) = PickAway 'game 2
+        ScheduleA(17, (Team4 / 2)) = PickHome2
 
-        PickHome = MT.GenerateInt32(1, Teams.Count) 'randomly chooses a home team---need to make sure it picks a team that it didn't play the week before...
+        Console.WriteLine(PickAway & " at " & PickHome)
+        Console.WriteLine(PickAway2 & " at " & PickHome2)
+        Console.WriteLine(PickHome & " at " & PickAway2)
+        Console.WriteLine(PickHome2 & " at " & PickAway)
 
-        'Teams.Add(HTeam.Item(1)) 'adds in other teams to give a full list of divisional opponents to choose game from
-        'Teams.Add(HTeam.Item(2))
+        Dim i As Integer = 1
+        Dim count As Integer = 0
+        Dim Hlist As New List(Of Integer)
+        Dim Alist As New List(Of Integer)
 
-        For i As Integer = 1 To HTeam.Count 'cycles through the HTeam.list
+        While count < 4
+            For i = 1 To HomeTeam.Count 'removes games that have been scheduled already
+                If (HomeTeam(i) = PickHome And AwayTeam(i) = PickAway) Or (HomeTeam(i) = PickHome2 And AwayTeam(i) = PickAway2) Or (HomeTeam(i) = PickAway2 And AwayTeam(i) = PickHome) Or (HomeTeam(i) = PickAway And AwayTeam(i) = PickHome2) Then
+                    Hlist.Add(i) 'adds the game number to remove from HomeTeam/AwayTeam collection
+                    Alist.Add(i)
+                    Console.WriteLine(AwayTeam(i) & " at " & HomeTeam(i))
+                    count += 1
+                End If
+            Next i
+        End While
 
-            While HTeam(i) = PickAway And ATeam(i) = PickHome And PickAway = PickHome 'continues to re-choose team if teams have already played
-                PickHome = MT.GenerateInt32(1, Teams.Count)
-            End While
-        Next i
+        count = 0
+        While Hlist.Count > 0
+            Console.WriteLine(AwayTeam(Hlist(0) - count) & " at " & HomeTeam(Hlist(0) - count))
+            HomeTeam.Remove(Hlist(0) - count)
+            AwayTeam.Remove(Alist(0) - count)
+            Hlist.RemoveAt(0)
+            Alist.RemoveAt(0)
+            count += 1
+        End While
 
-        PickHome2 = PickHome
-        PickHome = Teams.Item(PickHome)
-        Teams.Remove(PickHome2)
-        HTeam.Add(PickHome)
-        ATeam.Add(PickAway)
 
-        Dim T1 As Boolean = False
-        Dim T2 As Boolean = False
-        Dim T3 As Boolean = False
-        Dim T4 As Boolean = False
-        Console.WriteLine("Team " & PickHome & " vs. " & PickAway)
-        Teams.Clear()
-
-        For i As Integer = 1 To HTeam.Count
-            If HTeam.Item(i) = Team1 Then
-                T1 = True
-            ElseIf HTeam.Item(i) = Team2 Then
-                T2 = True
-            ElseIf HTeam.Item(i) = Team3 Then
-                T3 = True
-            ElseIf HTeam.Item(i) = Team4 Then
-                T4 = True
-            End If
-        Next i
-
-        If T1 = False Then HTeam.Add(Team1)
-        If T2 = False Then HTeam.Add(Team2)
-        If T3 = False Then HTeam.Add(Team3)
-        If T4 = False Then HTeam.Add(Team4)
-
-        T1 = False
-        T2 = False
-        T3 = False
-        T4 = False
-
-        For i As Integer = 1 To ATeam.Count
-            If ATeam.Item(i) = Team1 Then
-                T1 = True
-            ElseIf ATeam.Item(i) = Team2 Then
-                T2 = True
-            ElseIf ATeam.Item(i) = Team3 Then
-                T3 = True
-            ElseIf ATeam.Item(i) = Team4 Then
-                T4 = True
-            End If
-        Next i
-
-        If T1 = False Then ATeam.Add(Team1)
-        If T2 = False Then ATeam.Add(Team2)
-        If T3 = False Then ATeam.Add(Team3)
-        If T4 = False Then ATeam.Add(Team4)
-
-        Console.WriteLine("Team " & HTeam.Item(4) & " vs. " & ATeam.Item(4))
-        ' ATeam.Add(Teams(1))
-
-        Teams.Add(HTeam)
-        Teams.Add(ATeam)
-        Return Teams 'returns a collection of collections
-
-    End Function
+    End Sub
+    ''' <summary>
+    ''' There are 12 possible bye week configurations, which range from 6 bye weeks to 9 bye weeks.  This will randomly select a bye week configuration to use for the schedule
+    ''' </summary>
     Private Sub GetByeWeek()
-        'Creates 5 Weeks with 4 teams having byes and 2 weeks with 6 teams having byes
+
+        Dim NumTwoTeams As Integer 'number of times 2 teams have a bye in a given week for each configuration
+        Dim NumFourTeams As Integer 'number of times 4 teams have a bye in a given week for each configuration
+        Dim NumSixTeams As Integer 'number of times 6 teams have a bye in a given week for each configuration
+        Dim FirstByeWeek As Integer 'the first week of the schedule that has byes in it
+        Dim LastByeWeek As Integer 'the last week of the schedule that has byes in it
+
+        Dim ByeConfig As Integer = MT.GenerateInt32(1, 12) 'randomly selects one of 12 bye week configurations to use
+
+        Select Case ByeConfig
+            Case 1
+                NumTwoTeams = 0
+                NumFourTeams = 2
+                NumSixTeams = 4
+
+            Case 2
+                NumTwoTeams = 0
+                NumFourTeams = 8
+                NumSixTeams = 0
+
+            Case 3
+                NumTwoTeams = 0
+                NumFourTeams = 5
+                NumSixTeams = 2
+
+            Case 4
+                NumTwoTeams = 1
+                NumFourTeams = 6
+
+            Case 5
+                NumTwoTeams = 1
+                NumFourTeams = 3
+                NumSixTeams = 3
+
+            Case 6
+                NumTwoTeams = 2
+                NumFourTeams = 4
+                NumSixTeams = 2
+
+            Case 7
+                NumTwoTeams = 2
+                NumFourTeams = 1
+                NumSixTeams = 4
+
+            Case 8
+                NumTwoTeams = 3
+                NumFourTeams = 2
+                NumSixTeams = 3
+
+            Case 9
+                NumTwoTeams = 3
+                NumFourTeams = 5
+                NumSixTeams = 1
+            Case 10
+                NumTwoTeams = 4
+                NumFourTeams = 3
+                NumSixTeams = 2
+            Case 11
+                NumTwoTeams = 4
+                NumFourTeams = 0
+                NumSixTeams = 4
+            Case 12
+                NumTwoTeams = 5
+                NumFourTeams = 1
+                NumSixTeams = 3
+        End Select
+
+        Select Case (NumTwoTeams + NumFourTeams + NumSixTeams) 'sets first and last bye weeks depending on how many total weeks of byes there will be
+            Case 6
+                FirstByeWeek = 5
+                LastByeWeek = 10
+            Case 7
+                FirstByeWeek = 4
+                LastByeWeek = 10
+            Case 8
+                FirstByeWeek = 4
+                LastByeWeek = 11
+            Case 9
+                FirstByeWeek = 4
+                LastByeWeek = 12
+        End Select
+
         Dim ByeWeek As New Collection
         Dim AlreadyHadBye As Boolean 'True if team already had bye
 
-        Dim SixTeams1 As Integer = MT.GenerateInt32(4, 10)
-        Dim SixTeams2 As Integer = MT.GenerateInt32(4, 10)
+        For week As Integer = FirstByeWeek To LastByeWeek 'starting and ending byweeks
 
-        Do While SixTeams1 = SixTeams2
-            SixTeams2 = MT.GenerateInt32(4, 10)
-        Loop
+            Dim RndByeTeams As Integer = MT.GenerateInt32(1, 3) 'chooses one of the bye week types
+            Dim Check As Boolean = False
 
-        For week As Integer = 4 To 10 'Bye weeks are week 4 thru 10
+            While Check = False 'Check to make sure there are available weeks to run the byes
+                While RndByeTeams = 1 And NumTwoTeams = 0 'can't have 2 teams on a bye because
+                    RndByeTeams = MT.GenerateInt32(2, 3)
+                End While
+                While RndByeTeams = 2 And NumFourTeams = 0
+                    RndByeTeams = MT.GenerateInt32(1, 3)
+                End While
+                While RndByeTeams = 3 And NumSixTeams = 0
+                    RndByeTeams = MT.GenerateInt32(1, 2)
+                End While
+                If (RndByeTeams = 1 And NumTwoTeams <> 0) Or (RndByeTeams = 2 And NumFourTeams <> 0) Or (RndByeTeams = 3 And NumSixTeams <> 0) Then 'can use that type to schedule bye weeks
+                    Check = True
+                End If
+            End While
+
             Dim count As Integer = 0
-            If SixTeams1 = week Or SixTeams2 = week Then 'Six teams are on bye this week
-                Do Until count = 6
-                    Dim Team As Integer = MT.GenerateInt32(1, 32)
-                    If ByeWeek.Count > 0 Then
-                        For check As Integer = 1 To ByeWeek.Count
-                            If ByeWeek.Item(check) = Team Then
-                                AlreadyHadBye = True
-                                Exit For
-                            End If
-                        Next check
-                        If AlreadyHadBye = False Then
-                            InitTeams(Team).ByeWeek = week
-                            ByeWeek.Add(Team)
-                            count += 1
-                        End If
-                    Else
-                        If AlreadyHadBye = False Then
-                            InitTeams(Team).ByeWeek = week
-                            ByeWeek.Add(Team)
-                            count += 1
-                        End If
-                    End If
-                    AlreadyHadBye = False
-                Loop
-            Else 'Four teams are on bye this week
-                Do Until count = 4
-                    Dim Team As Integer = MT.GenerateInt32(1, 32)
-                    If ByeWeek.Count > 0 Then
-                        For check As Integer = 1 To ByeWeek.Count
-                            If ByeWeek.Item(check) = Team Then
-                                AlreadyHadBye = True
-                                Exit For
-                            End If
-                        Next check
-                        If AlreadyHadBye = False Then
-                            InitTeams(Team).ByeWeek = week
-                            ByeWeek.Add(Team)
-                            count += 1
-                        End If
-                    Else
-                        If AlreadyHadBye = False Then
-                            InitTeams(Team).ByeWeek = week
-                            ByeWeek.Add(Team)
-                            count += 1
-                        End If
-                    End If
-                    AlreadyHadBye = False
-                Loop
+            Dim NumTeams As Integer = 0 'Number of teams on a bye this week
+
+            If RndByeTeams = 3 Then 'Six teams are on bye this week
+                NumTeams = 6
+                NumSixTeams -= 1
+            ElseIf RndByeTeams = 2 Then 'Four teams are on a bye this week
+                NumTeams = 4
+                NumFourTeams -= 1
+            ElseIf RndByeTeams = 1 Then 'Two teams are on a bye this week
+                NumTeams = 2
+                NumTwoTeams -= 1
             End If
+
+            Do Until count = NumTeams
+                Dim Team As Integer = MT.GenerateInt32(1, 32)
+                If ByeWeek.Count > 0 Then
+                    For tmcheck As Integer = 1 To ByeWeek.Count
+                        If ByeWeek.Item(tmcheck) = Team Then
+                            AlreadyHadBye = True
+                            Exit For
+                        End If
+                    Next tmcheck
+                    If AlreadyHadBye = False Then
+                        InitTeams(Team).ByeWeek = week
+                        ByeWeek.Add(Team)
+                        count += 1
+                    End If
+                Else
+                    If AlreadyHadBye = False Then
+                        InitTeams(Team).ByeWeek = week
+                        ByeWeek.Add(Team)
+                        count += 1
+                    End If
+                End If
+                AlreadyHadBye = False
+            Loop
+
         Next week
     End Sub
-    Private Sub CanGameBePlayed(ByVal weeknum As Integer, ByVal games As Integer)
-        Dim team As Integer
-        team = 1
-        Do Until team = 33
-            For Gamecheck As Integer = 1 To GameH.Count
-                If team = GameH.Item(Gamecheck) Or team = GameA.Item(Gamecheck) Then
-                    BoolCheck = True
-                    Exit For
-                End If
-            Next Gamecheck
+    ''' <summary>
+    ''' Checks to see if every other team has a game that can be played this week if this game gets scheduled. Returns True if all other teams can play a game and false if they cannot
+    ''' </summary>
+    ''' <param name="weeknum"></param>
+    ''' <param name="Games"></param>
+    ''' <param name="Home"></param>
+    ''' <param name="Away"></param>
+    ''' <returns></returns>
+    Private Function CanGameBePlayed(ByVal weeknum As Integer, ByVal Games As Integer, ByVal Home As Integer, ByVal Away As Integer) As Boolean
+        'rewrote  76 lines into 25
+        Dim team As Integer = 1
+        Dim TeamsRemaining As New List(Of Integer)
+        Dim CheckTeam As Integer = 0
 
-            If InitTeams(team).ByeWeek = weeknum Then
-                BoolCheck = True
-            End If
+        While team <> 32 'loops until team = 32
+            TeamsRemaining.Clear()
 
-            If BoolCheck = False Then
-
-                For i As Integer = 1 To HomeTeam.Count 'cycle thru all scheduled games
-
-                    If HomeTeam.Item(i) = team Then
-                        If HomeTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
-                            TeamsLeftToPlay.Add(HomeTeam.Item(i))
-                        ElseIf AwayTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
-                            TeamsLeftToPlay.Add(AwayTeam.Item(i))
-                        End If
-                    End If
-
-                    If AwayTeam.Item(i) = team Then
-                        If HomeTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
-                            TeamsLeftToPlay.Add(HomeTeam.Item(i))
-                        ElseIf AwayTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
-                            TeamsLeftToPlay.Add(AwayTeam.Item(i))
-                        End If
+            If team <> Home And team <> Away And AlreadyPlayed(team) <> 1 Then 'checks all other teams that still need to play games
+            For i As Integer = 0 To InitTeams(team).HomeGames.Count - 1 'cycle through all remaining games
+                    If InitTeams(team).HomeGames.Item(i) <> Away Then
+                        TeamsRemaining.Add(InitTeams(team).HomeGames.Item(i))
+                    End If 'adds the list of opponents this team has left
+                Next i
+                For i As Integer = 0 To InitTeams(team).AwayGames.Count - 1
+                    If InitTeams(team).AwayGames.Item(i) <> Home Then
+                        TeamsRemaining.Add(InitTeams(team).AwayGames.Item(i))
                     End If
                 Next i
+            End If
 
-                For Runcheck As Integer = 1 To GameH.Count 'cycle thru games scheduled for the week
+            If AlreadyPlayed(team) <> 1 And team <> Home And team <> Away Then 'no need to check games for teams that have already played
+                For Runcheck As Integer = 1 To GameH.Count 'cycle thru games already scheduled for the week
+                    CheckTeam = 0
 
-                    Dim CheckTeam As Integer = 1
-
-                    Do While CheckTeam <= TeamsLeftToPlay.Count
-
-                        If GameH.Item(Runcheck) = TeamsLeftToPlay.Item(CheckTeam) _
-                        Or GameA.Item(Runcheck) = TeamsLeftToPlay.Item(CheckTeam) Then
-                            TeamsLeftToPlay.Remove(CheckTeam)
-                            CheckTeam = 0
+                    Do While CheckTeam <= TeamsRemaining.Count - 1 'cycle through the list and find out if teams on the list have already been scheduled. If they have remove them as they cannot play.
+                        If TeamsRemaining.Contains(GameH.Item(Runcheck)) Then
+                            TeamsRemaining.Remove(GameH.Item(Runcheck))
+                            CheckTeam = 0 'resets variable to start at beginning of the list 
+                        End If
+                        If TeamsRemaining.Contains(GameA.Item(Runcheck)) Then
+                            TeamsRemaining.Remove(GameA.Item(Runcheck))
+                            CheckTeam = 0 'resets variable to start at beginning of the list 
                         End If
                         CheckTeam += 1
                     Loop
 
-                Next Runcheck
-                If TeamsLeftToPlay.Count < 1 And GameH.Count > 0 Then 'no teams left to play for this team,
-                    'must restart the scheduler for the week.
-                    StartedOver += 1
-                    'increments a counter to redo the weekly schedule from the beginning, as this attempted schedule is not working for whatever reason
-                    If StartedOver > 30 Then
-                        For i As Integer = 1 To GameH.Count
-                            HomeTeam.Add(GameH.Item(i))
-                            AwayTeam.Add(GameA.Item(i))
-                        Next i
-                        GameH.Clear()
-                        GameA.Clear()
-                    Else
-                        HomeTeam.Add(GameH.Item(GameH.Count))
-                        AwayTeam.Add(GameA.Item(GameH.Count))
-                        GameH.Remove(GameH.Count)
-                        GameA.Remove(GameA.Count)
+                    If TeamsRemaining.Count = 0 And GameH.Count > 0 Then 'no games available for this team to play---restart the schedule for the week.
+                        Return False
                     End If
-                    RedoGame = True 'flags boolean
-                    TeamsLeftToPlay.Clear()
-                    BoolCheck = False
-                    Exit Do
-                End If
-            End If
-            If team = 32 Then
-                Exit Do
+                    'TeamsRemaining.Clear() 'clear the list for the next team to check
+                    CheckTeam = 0
+                Next Runcheck
             End If
             team += 1
-            TeamsLeftToPlay.Clear()
-            BoolCheck = False
-        Loop
-    End Sub
+        End While
+
+        Return True 'All teams must have games that can be scheduled for this week, return true
+
+
+        'Dim tteam As Integer
+        'team = 1
+        'Do Until team = 33
+        'For Gamecheck As Integer = 1 To GameH.Count
+        'If team = GameH.Item(Gamecheck) Or team = GameA.Item(Gamecheck) Then
+        'BoolCheck = True
+        'Exit For
+        'End If
+        'Next Gamecheck
+
+        'If InitTeams(team).ByeWeek = weeknum Then
+        'BoolCheck = True
+        'End If
+
+        'If BoolCheck = False Then
+
+        'For i As Integer = 1 To HomeTeam.Count 'cycle thru all scheduled games
+
+        'If HomeTeam.Item(i) = team Then
+        'If HomeTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
+        'TeamsLeftToPlay.Add(HomeTeam.Item(i))
+        'ElseIf AwayTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
+        'TeamsLeftToPlay.Add(AwayTeam.Item(i))
+        'End If
+        'End If
+
+        'If AwayTeam.Item(i) = team Then
+        'If HomeTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
+        'TeamsLeftToPlay.Add(HomeTeam.Item(i))
+        'ElseIf AwayTeam.Item(i) <> team And InitTeams(team).ByeWeek <> weeknum Then
+        'TeamsLeftToPlay.Add(AwayTeam.Item(i))
+        'End If
+        'End If
+        'Next i
+        '
+        'For Runcheck As Integer = 1 To GameH.Count 'cycle thru games scheduled for the week
+
+        'Dim CheckTeam As Integer = 1
+
+        'Do While CheckTeam <= TeamsLeftToPlay.Count
+
+        'If GameH.Item(Runcheck) = TeamsLeftToPlay.Item(CheckTeam) _
+        'Or GameA.Item(Runcheck) = TeamsLeftToPlay.Item(CheckTeam) Then
+        'TeamsLeftToPlay.Remove(CheckTeam)
+        'CheckTeam = 0
+        'End If
+        'CheckTeam += 1
+        'Loop
+
+        'Next Runcheck
+
+        'If TeamsLeftToPlay.Count < 1 And GameH.Count > 0 Then 'no teams left to play for this team,
+        'must restart the scheduler for the week.
+        'StartedOver += 1
+        'increments a counter to redo the weekly schedule from the beginning, as this attempted schedule is not working for whatever reason
+        'If StartedOver > 30 Then
+        'For i As Integer = 1 To GameH.Count
+        'HomeTeam.Add(GameH.Item(i))
+        'AwayTeam.Add(GameA.Item(i))
+        'Next i
+        'GameH.Clear()
+        'GameA.Clear()
+        'Else
+        'HomeTeam.Add(GameH.Item(GameH.Count))
+        'AwayTeam.Add(GameA.Item(GameH.Count))
+        'GameH.Remove(GameH.Count)
+        'GameA.Remove(GameA.Count)
+        'End If
+        'RedoGame = True 'flags boolean
+        'TeamsLeftToPlay.Clear()
+        'BoolCheck = False
+        'Exit Do
+        'End If
+        'End If
+        'If team = 32 Then
+        'Exit Do
+        'End If
+        'team += 1
+        'TeamsLeftToPlay.Clear()
+        'BoolCheck = False
+        'Loop
+    End Function
 
 End Class

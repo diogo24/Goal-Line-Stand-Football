@@ -402,7 +402,7 @@ LSSnapAccuracy int NULL CONSTRAINT PID PRIMARY KEY(PlayerID)"
             PlayerDT.Rows(i).Item("Tackling") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("RETKickReturn") = GetKickRetAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
             PlayerDT.Rows(i).Item("RETPuntReturn") = GetPuntRetAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
-            PlayerDT.Rows(i).Item("DOB") = GetDOB(PlayerDT.Rows(i).Item("Age"), i)
+            PlayerDT.Rows(i).Item("DOB") = GetDOB(PlayerDT.Rows(i).Item("Age"), i) 'gets the players DOB
             'Console.WriteLine(PlayerDT.Rows(i).Item("DOB"))
             GetSTAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
             GetLSAbility(PlayerDT.Rows(i).Item("CollegePOS"), i)
@@ -1203,6 +1203,7 @@ LSSnapAccuracy int NULL CONSTRAINT PID PRIMARY KEY(PlayerID)"
         'TestDate = Convert.ToDateTime("" & Month & "/" & Day & "/" & Year).Date
         'Return Convert.ToDateTime("" & Month & "/" & Day & "/" & Year).ToShortDateString
     End Function
+
     ''' <summary>
     ''' Common Position switches include:
     ''' QB ---> WR ---Typically very athletic QB's that aren't good enough at QB for the NFL(Julian Edelman for example)
@@ -1216,9 +1217,17 @@ LSSnapAccuracy int NULL CONSTRAINT PID PRIMARY KEY(PlayerID)"
     ''' other examples and less common changes occur---
     ''' 
     ''' Need to figure out how often and under what circumstances a player would have a different position---currently it sets it to the same position as they are in college
-    ''' </summary>
+    ''' 
+    ''' on offense: QB > WR(RB) > RB > FB > TE > OT > OG > OC
+    ''' 
+    ''' CB > S > LB > DE > DT
+    '''
+    ''' players are able To move up Or down 1 slot - so starting from most athletic To least athletic defensively you'd have CB > S > LB > DE > DT. 
+    ''' So all a corner could do Is move DOWN. Safeties can move UP Or DOWN to corner Or LB. Any player moving UP would need to have considerable athleticism.
+    '''</summary>
     ''' <param name="Pos"></param>
     ''' <returns></returns>
+    ''' 
     Private Function GetNFLPos(ByVal Pos As String) As String '####TODO: Determine how often and waht percentage of players would play a different position ni the NFL than in college(I'm thinking maybe 5-7%, most common is OT to OG and CB to SF
         'Players who are too small/light/slow for their current college positions
         'can be projected to play a different position in the NFL
