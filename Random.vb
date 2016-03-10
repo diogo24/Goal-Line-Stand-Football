@@ -4,8 +4,11 @@ Imports System.Math
 
 Public Class Random
 
-    ''' A random number generator with a uniform distribution using the Mersenne 
+    ''' <summary>
+    ''' A random number generator With a uniform distribution Using the Mersenne 
     ''' Twister algorithm.
+    ''' </summary>
+
 
     Public Class MersenneTwister
         Private Const N As Integer = 624
@@ -88,8 +91,10 @@ Public Class Random
         Public Function GenerateInt32() As Integer
             Return CInt(GenerateUInt32() >> 1)
         End Function
-        ''' ''' Generates a random integer between 0 and maxValue. 
-        ''' ''' ''' The maximum value. Must be greater than zero. 
+        ''' <summary>
+        '''   Generates a random Integer between 0 And maxValue. 
+        '''   The maximum value. Must be greater than zero. 
+        ''' </summary>
         Public Function GenerateInt32(ByVal maxValue As Integer) As Integer
             Return GenerateInt32(0, maxValue)
         End Function
@@ -108,7 +113,13 @@ Public Class Random
             'Return CDbl((Math.Floor(MaxValue - MinValue + 1) * GenerateDouble() + MinValue))
             Return CDbl(((MaxValue - MinValue) * GenerateDouble()) + MinValue)
         End Function
-
+        ''' <summary>
+        ''' Returns a number based on a gaussian curve
+        ''' Takes the mean and the STD
+        ''' </summary>
+        ''' <param name="Mean"></param>
+        ''' <param name="StDev"></param>
+        ''' <returns></returns>
         Public Function GetGaussian(ByVal Mean As Double, ByVal StDev As Double) As Double
             Dim x1, x2, w, y1 As Double
             Static y2 As Double
