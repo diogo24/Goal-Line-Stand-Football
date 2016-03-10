@@ -16,6 +16,9 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -28,10 +31,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +42,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>Football2.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,8 +52,21 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>Football2.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Generation">
+      <HintPath>..\..\..\..\..\..\..\Users\MNasty\Documents\Visual Studio 2015\Projects\Generation\Generation\bin\Debug\Generation.dll</HintPath>
+    </Reference>
+    <Reference Include="Mersenne, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\..\..\Users\MNasty\Documents\Visual Studio 2015\Projects\Random\Random\bin\Debug\Mersenne.dll</HintPath>
+    </Reference>
+    <Reference Include="NFLScheduler">
+      <HintPath>..\..\..\..\..\..\..\Users\MNasty\Documents\Visual Studio 2015\Projects\NFLScheduler\NFLScheduler\bin\Debug\NFLScheduler.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLFunctions">
+      <HintPath>..\..\..\..\..\..\..\Users\MNasty\Documents\Visual Studio 2015\Projects\SQLFunctions\SQLFunctions\bin\Debug\SQLFunctions.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -70,16 +85,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AIDecisionsInGame.vb" />
-    <Compile Include="DataFunctions.vb" />
-    <Compile Include="Draft.vb" />
     <Compile Include="DraftForm.Designer.vb">
       <DependentUpon>DraftForm.vb</DependentUpon>
     </Compile>
     <Compile Include="DraftForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Evaluation.vb" />
     <Compile Include="Football.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -95,9 +106,6 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GameEngine.vb" />
-    <Compile Include="Generation.vb" />
-    <Compile Include="GenSQL.vb" />
     <Compile Include="GlobalVar.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -114,9 +122,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="PBP.vb" />
-    <Compile Include="Random.vb" />
-    <Compile Include="Scheduler.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DraftForm.resx">
@@ -161,6 +166,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DraftScoutNotes.txt" />
+    <Content Include="FootballData.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FootballData_log.ldf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
@@ -176,6 +187,11 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
