@@ -19,12 +19,12 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.PbpTableAdapter1 = New Football2.FootballTableAdapters.PBPTableAdapter
+        'Me.PbpTableAdapter1 = New Football2.FootballTableAdapters.PBPTableAdapter
         Me.SuspendLayout()
         '
         'PbpTableAdapter1
         '
-        Me.PbpTableAdapter1.ClearBeforeFill = True
+        'Me.PbpTableAdapter1.ClearBeforeFill = True
         '
         'Form1
         '
@@ -36,6 +36,6 @@ Partial Class Form1
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents PbpTableAdapter1 As Football2.FootballTableAdapters.PBPTableAdapter
+    'Friend WithEvents PbpTableAdapter1 As Football2.FootballTableAdapters.PBPTableAdapter
 
 End Class
