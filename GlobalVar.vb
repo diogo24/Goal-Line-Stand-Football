@@ -4,7 +4,7 @@ Module GlobalVar
     'Module contains Global Variables for various functions
     Public GetTables As New SQLFunctions.DataFunctions
     'Public GetPBP As New PBP
-    Public PBPDT As New DataTable
+    'Public PBPDT As New DataTable
     'Public OwnerDT As New DataTable
     'Public PlayerDT As New DataTable
     'Public DraftDT As New DataTable
