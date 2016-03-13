@@ -1,2 +1,0 @@
-C:\Users\MNasty\Source\Repos\Goal-Line-Stand-Football\bin\Debug\Football2.exe.config
-C:\Users\MNasty\Source\Repos\Goal-Line-Stand-Football\obj\Debug\Football2.vbproj.ResolveComReference.cache
