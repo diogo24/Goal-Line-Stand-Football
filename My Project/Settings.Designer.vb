@@ -57,11 +57,10 @@ Namespace My
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=M-664C3012670A4\SQLEXPRESS;Initial Catalog=FootballData;Integrated Se"& _ 
-            "curity=True")>  _
-        Public ReadOnly Property ConnectionString() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("data source=|DataDirectory|\Football")>  _
+        Public ReadOnly Property FootballConnectionString() As String
             Get
-                Return CType(Me("ConnectionString"),String)
+                Return CType(Me("FootballConnectionString"),String)
             End Get
         End Property
     End Class
