@@ -1,6 +1,8 @@
 Imports System.Data.Sql
 Imports System.Data.SqlTypes
-
+''' <summary>
+''' For use with SQL Server---Deprecated as we have switched over to SQLite
+''' </summary>
 Public Class DataFunctions
 
     Private Function GetConnectionString()
