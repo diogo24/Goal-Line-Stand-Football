@@ -44,12 +44,6 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mersenne">
-      <HintPath>..\..\Random\Random\bin\Debug\Mersenne.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLFunctions">
-      <HintPath>..\..\SQLFunctions\SQLFunctions\bin\Debug\SQLFunctions.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -105,6 +99,16 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Random\Random\Mersenne.vbproj">
+      <Project>{9fcefa45-842d-4c59-a1fd-35fd5e1bc55f}</Project>
+      <Name>Mersenne</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SQLFunctions\SQLFunctions\SQLFunctions.vbproj">
+      <Project>{5a4a94c5-fc1d-4301-a83f-810d1961f4ba}</Project>
+      <Name>SQLFunctions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

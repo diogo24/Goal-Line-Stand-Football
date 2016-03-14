@@ -44,12 +44,6 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mersenne">
-      <HintPath>..\..\Random\Random\obj\Debug\Mersenne.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLFunctions">
-      <HintPath>..\..\SQLFunctions\SQLFunctions\obj\Debug\SQLFunctions.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -122,13 +116,13 @@
     <Content Include="LName.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\NFLDraft\NFLDraft\NFLDraft.vbproj">
-      <Project>{f8f1ebd4-a579-4c44-9d3d-c50a968ab535}</Project>
-      <Name>NFLDraft</Name>
+    <ProjectReference Include="..\..\Random\Random\Mersenne.vbproj">
+      <Project>{9fcefa45-842d-4c59-a1fd-35fd5e1bc55f}</Project>
+      <Name>Mersenne</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\NFLScheduler\NFLScheduler\NFLScheduler.vbproj">
-      <Project>{3a3ebcab-97d5-49d5-8592-e754b1379384}</Project>
-      <Name>NFLScheduler</Name>
+    <ProjectReference Include="..\..\SQLFunctions\SQLFunctions\SQLFunctions.vbproj">
+      <Project>{5a4a94c5-fc1d-4301-a83f-810d1961f4ba}</Project>
+      <Name>SQLFunctions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
