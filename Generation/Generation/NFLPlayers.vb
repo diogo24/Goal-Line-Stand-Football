@@ -1,13 +1,12 @@
-﻿Imports strings
+﻿
 
 ''' <summary>
 ''' Class for Generating NFL Players at game startup, ie, players that are already on a team
 ''' </summary>
 Public Class NFLPlayers
     Inherits Players
-    'Dim MyPlayer As New Players
     Dim SQLFieldNames As String
-
+    Dim SQLCmd As New SQLFunctions.SQLiteDataFunctions
     Private Sub PutPlayerOnTeam(ByVal Pos As Integer)
         'determines what team player is on via generic position limits
 
@@ -76,17 +75,19 @@ Public Class NFLPlayers
     End Sub
     Public Sub GetRosterPlayers(ByVal numplayers As Integer)
         SQLFieldNames = GetSQLFields("NFL")
-        GetTables.CreateTable(PlayerDT, "Players", SQLFieldNames)
-        GetTables.DeleteTable(PlayerDT, "Players")
-        GetTables.LoadTable(PlayerDT, "Players")
-        PlayerDT.Rows.Add(0)
+        SQLiteTables.CreateTable(MyDB, PlayerDT, "Players", SQLFieldNames)
+        SQLiteTables.DeleteTable(MyDB, PlayerDT, "Players")
+        SQLiteTables.LoadTable(MyDB, PlayerDT, "Players")
+        Dim MyPos As String
+
+        PlayerDT.Rows.Add()
 
         For i As Integer = 1 To numplayers
             PlayerDT.Rows.Add(i)
-
-            PlayerDT.Rows(i).Item("POS") = GetCollegePos()
-            GenNames(PlayerDT, i, "NFLPlayer", PlayerDT.Rows(i).Item("POS"))
-            GetPosSkills(PlayerDT.Rows(i).Item("POS"), i)
+            MyPos = GetCollegePos() 'returns the "normal" version without the  ' '
+            PlayerDT.Rows(i).Item("POS") = String.Format("'{0}'", MyPos)
+            GenNames(PlayerDT, i, "NFLPlayer", MyPos)
+            GetPosSkills(MyPos, i)
             PlayerDT.Rows(i).Item("Explosion") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("Athleticism") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("JumpingAbility") = MT.GetGaussian(49.5, 16.5)
@@ -106,36 +107,14 @@ Public Class NFLPlayers
             PlayerDT.Rows(i).Item("BallSecurity") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("QAB") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("COD") = MT.GetGaussian(49.5, 16.5)
-            PlayerDT.Rows(i).Item("RETKickReturn") = GetKickRetAbility(PlayerDT.Rows(i).Item("POS"), i)
-            PlayerDT.Rows(i).Item("RETPuntReturn") = GetPuntRetAbility(PlayerDT.Rows(i).Item("POS"), i)
+            PlayerDT.Rows(i).Item("RETKickReturn") = GetKickRetAbility(MyPos, i)
+            PlayerDT.Rows(i).Item("RETPuntReturn") = GetPuntRetAbility(MyPos, i)
             PlayerDT.Rows(i).Item("PlaybookKnowledge") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("Toughness") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("InjuryProne") = MT.GetGaussian(49.5, 16.5)
             PlayerDT.Rows(i).Item("Timing") = MT.GetGaussian(49.5, 16.5)
-            GetSTAbility(PlayerDT.Rows(i).Item("POS"), i)
-            GetLSAbility(PlayerDT.Rows(i).Item("POS"), i)
-
-            '####TODO---figure out why there are DBNull values generated for some players in FName, LName and College fields
-            'This is the only DB where this is happening and all code is the same for getting these values.
-
-            If PlayerDT.Rows(i).Item("FName") Is DBNull.Value Or PlayerDT.Rows(i).Item("LName") Is DBNull.Value Or PlayerDT.Rows(i).Item("College") Is DBNull.Value And i > 0 Then
-
-                If PlayerDT.Rows(i).Item("FName").ToString.Length < 2 Then
-                    'Console.WriteLine(PlayerDT.Rows(i).Item("FName").ToString)
-                    PlayerDT.Rows(i).Item("FName") = StrConv(FirstNames.Rows(MT.GenerateDouble(0, FirstNames.Rows.Count - 1)).Item(0), VbStrConv.ProperCase)
-                    'Console.WriteLine(PlayerDT.Rows(i).Item("FName").ToString)
-                End If
-                If PlayerDT.Rows(i).Item("LName").ToString.Length < 2 Then
-                    'Console.WriteLine(PlayerDT.Rows(i).Item("LName").ToString)
-                    PlayerDT.Rows(i).Item("LName") = StrConv(LastNames.Rows(MT.GenerateDouble(0, LastNames.Rows.Count - 1)).Item(0), VbStrConv.ProperCase)
-                    'Console.WriteLine(PlayerDT.Rows(i).Item("LName").ToString)
-                End If
-                If PlayerDT.Rows(i).Item("College").ToString.Length < 2 Then
-                    'Console.WriteLine(PlayerDT.Rows(i).Item("College").ToString)
-                    PlayerDT.Rows(i).Item("College") = Colleges.Rows(MT.GenerateDouble(0, Colleges.Rows.Count - 1)).Item(0)
-                    ' Console.WriteLine(PlayerDT.Rows(i).Item("College").ToString)
-                End If
-            End If
+            GetSTAbility(MyPos, i)
+            GetLSAbility(MyPos, i)
         Next i
 
 
@@ -143,30 +122,19 @@ Public Class NFLPlayers
             PutPlayerOnTeam(i)
         Next i
 
-
-
-
         For i As Integer = 0 To PlayerDT.Rows.Count - 1
 
             For col As Integer = 0 To PlayerDT.Columns.Count - 1
                 If PlayerDT.Rows(i).Item(col) Is DBNull.Value Then
                     PlayerDT.Rows(i).Item(col) = 0
                 End If
+
             Next col
         Next i
 
-
-        'For i As Integer = 1 To PlayerDT.Rows.Count - 1
-
+        SQLiteTables.BulkInsert("Football", PlayerDT, "Players")
 
 
-
-
-        'Next i
-
-        PlayerDT.Rows(0).Delete()
-
-        GetTables.UpdateTable(PlayerDT, "Players")
     End Sub
     Public Sub GetPosSkills(ByVal Pos As String, ByVal i As Integer)
         Select Case Pos
@@ -206,7 +174,7 @@ Public Class NFLPlayers
                 PlayerDT.Rows(i).Item("RBDurability") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("RBPowerAbility") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("RBRouteRunning") = MT.GetGaussian(49.5, 16.5)
-                PlayerDT.Rows(i).Item("RBRunningStyle") = "NONE"
+                PlayerDT.Rows(i).Item("RBRunningStyle") = "'NONE'"
                 PlayerDT.Rows(i).Item("RBPassBlocking") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("RBStart") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("RBRunVision") = MT.GetGaussian(49.5, 16.5)
@@ -283,13 +251,13 @@ Public Class NFLPlayers
                 PlayerDT.Rows(i).Item("OLRecover") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("OLStrength") = MT.GetGaussian(49.5, 16.5)
             Case "DE", "DL"
-                PlayerDT.Rows(i).Item("DLStyle") = "NONE"
+                PlayerDT.Rows(i).Item("DLStyle") = "'NONE'"
                 PlayerDT.Rows(i).Item("DLRunAtHim") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("DLTackling") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("DLAgainstTrapAbility") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("DLSlideAbility") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("DLRunPursuit") = MT.GetGaussian(49.5, 16.5)
-                PlayerDT.Rows(i).Item("DLPassRushTechnique") = "NONE"
+                PlayerDT.Rows(i).Item("DLPassRushTechnique") = "'NONE'"
                 PlayerDT.Rows(i).Item("DLHandUse") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("DLShedVsRunAway") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("DLTackleVsRunAway") = MT.GetGaussian(49.5, 16.5)
@@ -309,7 +277,7 @@ Public Class NFLPlayers
                 PlayerDT.Rows(i).Item("LBCoverage") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("LBHands") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("LBBlitz") = MT.GetGaussian(49.5, 16.5)
-                PlayerDT.Rows(i).Item("LBPassRushType") = "NONE"
+                PlayerDT.Rows(i).Item("LBPassRushType") = "'NONE'"
                 PlayerDT.Rows(i).Item("LBRead") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("LBInstincts") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("LBDefeatBlocks") = MT.GetGaussian(49.5, 16.5)
@@ -342,11 +310,11 @@ Public Class NFLPlayers
                 PlayerDT.Rows(i).Item("DBCOBP") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("DBFeet") = MT.GetGaussian(49.5, 16.5)
             Case "K"
-                PlayerDT.Rows(i).Item("KPlantRelationship") = "NONE"
-                PlayerDT.Rows(i).Item("KApproachAngle") = "NONE"
-                PlayerDT.Rows(i).Item("KBallFlight") = "NONE"
-                PlayerDT.Rows(i).Item("KSteppingPattern") = "NONE"
-                PlayerDT.Rows(i).Item("KKickingStyle") = "NONE"
+                PlayerDT.Rows(i).Item("KPlantRelationship") = "'NONE'"
+                PlayerDT.Rows(i).Item("KApproachAngle") = "'NONE'"
+                PlayerDT.Rows(i).Item("KBallFlight") = "'NONE'"
+                PlayerDT.Rows(i).Item("KSteppingPattern") = "'NONE'"
+                PlayerDT.Rows(i).Item("KKickingStyle") = "'NONE'"
                 PlayerDT.Rows(i).Item("KHandlingWind") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("KTackling") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("KRunAndPassAbility") = MT.GetGaussian(49.5, 16.5)
@@ -363,7 +331,7 @@ Public Class NFLPlayers
                 PlayerDT.Rows(i).Item("PFootSpeed") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("PApproachLine") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("PHandlingTime") = MT.GetGaussian(49.5, 16.5)
-                PlayerDT.Rows(i).Item("PSteppingPattern") = "NONE"
+                PlayerDT.Rows(i).Item("PSteppingPattern") = "'NONE'"
                 PlayerDT.Rows(i).Item("PHands") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("PTackling") = MT.GetGaussian(49.5, 16.5)
                 PlayerDT.Rows(i).Item("PRunAndPassAbility") = MT.GetGaussian(49.5, 16.5)

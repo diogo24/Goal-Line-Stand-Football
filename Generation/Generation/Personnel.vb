@@ -5,7 +5,7 @@ Public Class Personnel
     Inherits Person
     Public Sub GenScoutGrades(ByVal NumScouts As Integer, ByVal NumPlayers As Integer)
 
-        'GetTables.LoadTable(ScoutGradeDT, "ScoutGrades")
+        'SQLiteTables.LoadTable(ScoutGradeDT, "ScoutGrades")
         'If ScoutGradeDT.Rows.Count = 0 Then
         'Dim SQLFields As String = "(PID INTEGER PRIMARY KEY,"
 
@@ -17,8 +17,8 @@ Public Class Personnel
         'End If
         'Next ScoutID
 
-        GetTables.DeleteTable(ScoutGradeDT, "ScoutsGrade")
-        GetTables.LoadTable(ScoutGradeDT, "ScoutsGrade")
+        SQLiteTables.DeleteTable(MyDB, ScoutGradeDT, "ScoutsGrade")
+        SQLiteTables.LoadTable(MyDB, ScoutGradeDT, "ScoutsGrade")
 
         ScoutGradeDT.Rows.Add(0)
 
@@ -30,7 +30,7 @@ Public Class Personnel
         'End If
     End Sub
     Public Function GetOffPhil() As String
-        Select Case MT.GenerateInt32(1, 100)
+        Select Case MT.GenerateInt32(1, 90)
             Case 1 To 10 : Return "BalPass"
             Case 11 To 20 : Return "BalRun"
             Case 21 To 30 : Return "VertPass"
@@ -42,11 +42,11 @@ Public Class Personnel
             Case 77 To 82 : Return "SpreadPass"
             Case 83 To 88 : Return "SpreadBal"
             Case 89 To 90 : Return "Run-N-Shoot"
-            Case 91 To 100 : Return "Spread"
+                'Case 91 To 100 : Return "PassHeavy"
         End Select
     End Function
     Public Function GetDefPhil() As String
-        Select Case MT.GenerateInt32(1, 100)
+        Select Case MT.GenerateInt32(1, 94)
             Case 1 To 12 : Return "4-3Attack"
             Case 13 To 23 : Return "4-3Cover"
             Case 23 To 33 : Return "4-3Bal"
@@ -59,7 +59,7 @@ Public Class Personnel
             Case 76 To 83 : Return "Cover2Cover"
             Case 84 To 91 : Return "Cover2Bal"
             Case 92 To 93 : Return "46"
-            Case 94 To 100 : Return "Hybrid"
+                'Case 94 To 100 : Return "Hybrid"
         End Select
     End Function
 End Class

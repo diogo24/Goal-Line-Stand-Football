@@ -14,9 +14,9 @@ Public Class Players
         Select Case PlayerType
             Case "College"
 
-                SQLFieldNames = "DraftID int Not NULL, FName varchar(20) not NULL, LName varchar(20) Not NULL, College varchar(50) Not NULL, Age int Not NULL, DOB varchar(12) Not NULL, CollegePOS varchar(5) Not NULL, ActualGrade decimal(5,2) Not NULL, 
-ProjNFLPos varchar(5) Not NULL, Height int Not Null, Weight int Not NULL, FortyYardTime decimal(3,2) Not NULL, TwentyYardTime decimal(3,2) Not NULL, TenYardTime decimal(3,2) Not NULL, ShortShuttle decimal(3,2) Not NULL, BroadJump int Not NULL, 
-VertJump decimal(3,1) Not NULL, ThreeConeDrill decimal(3,2) Not NULL, BenchPress int Not NULL, InterviewSkills int Not NULL, WonderlicTest int Not NULL, SkillsTranslateToNFL int Not NULL, QBDropQuickness decimal(3,1) NULL, 
+                SQLFieldNames = "DraftID int PRIMARY KEY NOT NULL, FName varchar(20) NULL, LName varchar(20) NULL, College varchar(50) NULL, Age int NULL, DOB varchar(12) NULL, CollegePOS varchar(5) NULL, ActualGrade decimal(5,2) NULL, 
+ProjNFLPos varchar(5) NULL, Height int NULL, Weight int NULL, FortyYardTime decimal(3,2) NULL, TwentyYardTime decimal(3,2) NULL, TenYardTime decimal(3,2) NULL, ShortShuttle decimal(3,2) NULL, BroadJump int NULL, 
+VertJump decimal(3,1) NULL, ThreeConeDrill decimal(3,2) NULL, BenchPress int NULL, InterviewSkills int NULL, WonderlicTest int NULL, SkillsTranslateToNFL int NULL, QBDropQuickness decimal(3,1) NULL, 
 QBSetupQuickness decimal(3,1) NULL, QBReleaseQuickness decimal(3,1) NULL, QBShortAcc decimal(3,1) NULL, QBMedAcc decimal(3,1) NULL, QBLongAcc decimal(3,1) NULL, QBDecMaking decimal(3,1) NULL, QBFieldVision decimal(3,1) NULL, QBPoise decimal(3,1) NULL, 
 QBBallHandling decimal(3,1) NULL, QBTiming decimal(3,1) NULL, QBDelivery decimal(3,1) NULL, QBFollowThrough decimal(3,1) NULL, QBAvoidRush decimal(3,1) NULL, QBEscape decimal(3,1) NULL, QBScrambling decimal(3,1) NULL, QBRolloutRight decimal(3,1) NULL, 
 QBRolloutLeft decimal(3,1) NULL, QBArmStrength decimal(3,1) NULL, QBZip decimal(3,1) NULL, QBTouchScreenPass decimal(3,1) NULL, QBTouchSwingPass decimal(3,1) NULL, QBEffectiveShortOut decimal(3,1) NULL, QBEffectiveGoRoute decimal(3,1) NULL, 
@@ -44,14 +44,14 @@ PFootSpeed decimal(3,1) NULL, PApproachLine decimal(3,1) NULL, PHandlingTime dec
 PHangTime decimal(3,1) NULL, PPressureKicking decimal(3,1) NULL, PBlockZone decimal(3,1) NULL, PHandToFootTime decimal(3,1) NULL, PTiming decimal(3,1) NULL, Flexibility decimal(3,1) NULL, Clutch decimal(3,1) NULL, Production decimal(3,1) NULL, 
 Consistency decimal(3,1) NULL, TeamPlayer decimal(3,1) NULL, Instincts decimal(3,1) NULL, Focus decimal(3,1) NULL, PlayStrength decimal(3,1) NULL, Explosion decimal(3,1) NULL, DeliversBlow decimal(3,1) NULL, RiskTaker decimal(3,1) NULL,
 JumpingAbility decimal(3,1), Leadership decimal(3,1) NULL, Aggressive decimal(3,1) NULL,  Fearless decimal(3,1) NULL, FieldAwareness decimal(3,1) NULL, WorkEthic decimal(3,1) NULL, FilmStudy decimal(3,1),
-Character decimal(3,1) NULL, Toughness decimal(3,1) NULL, InjuryProne decimal(3,1) NULL, PlaybookKnowledge decimal(3,1) NULL, BallSecurity decimal(3,1), Timing decimal(3,1) NULL CONSTRAINT Draft_ID PRIMARY KEY(DraftID)"
+Character decimal(3,1) NULL, Toughness decimal(3,1) NULL, InjuryProne decimal(3,1) NULL, PlaybookKnowledge decimal(3,1) NULL, BallSecurity decimal(3,1), Timing decimal(3,1) NULL"
 
                 Return SQLFieldNames
 
             Case "NFL"
 
-                SQLFieldNames = "PlayerID int Not NULL, TeamID int not NULL, FName varchar(20) not NULL, LName varchar(20) not NULL, College varchar(50) not NULL, Age int Not NULL, DOB varchar(12) Not NULL, Height int Not Null, Weight int Not NULL,
-POS varchar(4) Not NULL, QAB int NULL, COD int NULL, QBDropQuickness int NULL, QBSetupQuickness int NULL, QBReleaseQuickness int NULL, QBShortAcc int NULL, QBMedAcc int NULL, QBLongAcc int NULL, QBDecMaking int NULL, 
+                SQLFieldNames = "PlayerID int PRIMARY KEY NOT NULL, TeamID int NULL, FName varchar(20) NULL, LName varchar(20) NULL, College varchar(50) NULL, Age int NULL, DOB varchar(12) NULL, Height int NULL, Weight int NULL,
+POS varchar(4) NULL, QAB int NULL, COD int NULL, QBDropQuickness int NULL, QBSetupQuickness int NULL, QBReleaseQuickness int NULL, QBShortAcc int NULL, QBMedAcc int NULL, QBLongAcc int NULL, QBDecMaking int NULL, 
 QBFieldVision int NULL, QBDeliveryQuickness int NULL, QBPoise int NULL, QBBallHandling int NULL, QBTiming int NULL, QBDelivery int NULL, QBFollowThrough int NULL, 
 QBAvoidRush int NULL, QBEscape int NULL, QBScrambling int NULL, QBRolloutRight int NULL, QBRolloutLeft int NULL, QBArmStrength int NULL, 
 QBZip int NULL, QBTouchScreenPass int NULL, QBTouchSwingPass int NULL, QBEffectiveShortOut int NULL, QBEffectiveGoRoute int NULL, 
@@ -85,8 +85,7 @@ PHandToFootTime int NULL, PTiming int NULL, STCoverage int NULL, STWillingness i
 Production int NULL, Consistency int NULL, TeamPlayer int NULL, Instincts int NULL, Focus int NULL,  RETKickReturn int NULL,RETPuntReturn int NULL, PlayStrength int NULL, FilmStudy int NULL,
 Durability int NULL, Explosion int NULL, JumpingAbility int NULL, DeliversBlow int NULL, Leadership int NULL, Character int NULL, Toughness int NULL, InjuryProne int NULL, WorkEthic int NULL,
 Aggressive int NULL,  Fearless int NULL, FieldAwareness int NULL, PlaybookKnowledge int NULL, RiskTaker int NULL, LSSnapAccuracy int NULL, LSSnapTime int NULL,
-BallSecurity int NULL, Timing int NULL CONSTRAINT Player_ID PRIMARY KEY(PlayerID)"
-
+BallSecurity int NULL, Timing int NULL"
 
                 Return SQLFieldNames
         End Select

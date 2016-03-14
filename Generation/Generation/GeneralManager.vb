@@ -7,16 +7,18 @@ Public Class GeneralManager
     Inherits Personnel
     Public Sub GenGMs(ByVal NumGMs As Integer)
 
-        Dim SQLFieldNames As String = "GMID int NOT NULL, TeamID int NOT NULL, FName varchar(20) NOT NULL, LName varchar(20) NOT NULL, College varchar(50) NOT NULL, Age int NOT NULL, DOB varchar(12) NOT NULL, Experience int NOT NULL, CoachPatience int NOT NULL, 
-Risktaker int NOT NULL, ValuesDraftPicks int NOT NULL, ValuesCombine int NOT NULL, ValuesCharacter int NOT NULL, ValuesProduction int NOT NULL, FranchiseTag int NOT NULL, JudgingDraft int NOT NULL, JudgingFA int NOT NULL, JudgingOwn int NOT NULL, 
-JudgingQB int NOT NULL, JudgingRB int NOT NULL, JudgingRec int NOT NULL, JudgingOL int NOT NULL, JudgingDL int NOT NULL, JudgingLB int NOT NULL, JudgingCB int NOT NULL, JudgingSF int NOT NULL, Loyalty int NOT NULL, Ego int NOT NULL, 
-OffPhil varchar(20) NOT NULL, QBImp int NOT NULL, RBImp int NOT NULL, FBImp int NOT NULL, WRImp int NOT NULL, WR2Imp int NOT NULL, WR3Imp int NOT NULL, LTImp int NOT NULL, LGImp int NOT NULL, CImp int NOT NULL, RGImp int NOT NULL, RTImp int NOT NULL, 
-TEImp int NOT NULL, DefPhil varchar(20) NOT NULL, DEImp int NOT NULL, DE2Imp int NOT NULL, DTImp int NOT NULL, DT2Imp int NOT NULL, NTImp int NOT NULL, MLBImp int NOT NULL, WLBImp int NOT NULL, SLBImp int NOT NULL, ROLBImp int NOT NULL, 
-LOLBImp int NOT NULL, CB1Imp int NOT NULL, CB2Imp int NOT NULL, CB3Imp int NOT NULL, FSImp int NOT NULL, SSImp int NOT NULL, DraftStrategy varchar(20) NOT NULL, TeamBuilding varchar(20) NOT NULL,  CONSTRAINT GM_ID PRIMARY KEY(GMID)"
+        Dim MyOPhil As String
+        Dim MyDPhil As String
+        Dim SQLFieldNames As String = "GMID int PRIMARY KEY NOT NULL, TeamID int NULL, FName varchar(20) NULL, LName varchar(20) NULL, College varchar(50) NULL, Age int NULL, DOB varchar(12) NULL, Experience int NULL, CoachPatience int NULL, 
+Risktaker int NULL, ValuesDraftPicks int NULL, ValuesCombine int NULL, ValuesCharacter int NULL, ValuesProduction int NULL, FranchiseTag int NULL, JudgingDraft int NULL, JudgingFA int NULL, JudgingOwn int NULL, 
+JudgingQB int NULL, JudgingRB int NULL, JudgingRec int NULL, JudgingOL int NULL, JudgingDL int NULL, JudgingLB int NULL, JudgingCB int NULL, JudgingSF int NULL, Loyalty int NULL, Ego int NULL, 
+OffPhil varchar(20) NULL, QBImp int NULL, RBImp int NULL, FBImp int NULL, WRImp int NULL, WR2Imp int NULL, WR3Imp int NULL, LTImp int NULL, LGImp int NULL, CImp int NULL, RGImp int NULL, RTImp int NULL, 
+TEImp int NULL, DefPhil varchar(20) NULL, DEImp int NULL, DE2Imp int NULL, DTImp int NULL, DT2Imp int NULL, NTImp int NULL, MLBImp int NULL, WLBImp int NULL, SLBImp int NULL, ROLBImp int NULL, 
+LOLBImp int NULL, CB1Imp int NULL, CB2Imp int NULL, CB3Imp int NULL, FSImp int NULL, SSImp int NULL, DraftStrategy varchar(20) NULL, TeamBuilding varchar(20) NULL"
 
-        GetTables.CreateTable(GMDT, "GMs", SQLFieldNames)
-        GetTables.DeleteTable(GMDT, "GMs")
-        GetTables.LoadTable(GMDT, "GMs")
+        SQLiteTables.CreateTable(MyDB, GMDT, "GMs", SQLFieldNames)
+        'SQLiteTables.DeleteTable(MyDB, GMDT, "GMs")
+        SQLiteTables.LoadTable(MyDB, GMDT, "GMs")
         GMDT.Rows.Add(0)
 
         For i As Integer = 1 To NumGMs
@@ -27,6 +29,8 @@ LOLBImp int NOT NULL, CB1Imp int NOT NULL, CB2Imp int NOT NULL, CB3Imp int NOT N
             Else
                 GMDT.Rows(i).Item("TeamID") = 0
             End If
+            MyOPhil = GetOffPhil()
+            MyDPhil = GetDefPhil()
             GenNames(GMDT, i, "GM")
             'GMDT.Rows(i).Item("Age") = MT.GenerateInt32(35, 70)
             GMDT.Rows(i).Item("Experience") = MT.GenerateInt32(0, (GMDT.Rows(i).Item("Age") - 35))
@@ -46,21 +50,20 @@ LOLBImp int NOT NULL, CB1Imp int NOT NULL, CB2Imp int NOT NULL, CB3Imp int NOT N
             GMDT.Rows(i).Item("JudgingSF") = MT.GetGaussian(49.5, 16.5)
             GMDT.Rows(i).Item("Loyalty") = MT.GetGaussian(49.5, 16.5)
             GMDT.Rows(i).Item("Ego") = MT.GetGaussian(49.5, 16.5)
-            GMDT.Rows(i).Item("OffPhil") = GetOffPhil()
-            GMDT.Rows(i).Item("DefPhil") = GetDefPhil()
-            GMDT.Rows(i).Item("DraftStrategy") = DraftStrategy()
-            GMDT.Rows(i).Item("TeamBuilding") = TeamBuilding()
-            PositionalImp(i, GMDT.Rows(i).Item("OffPhil"), GMDT.Rows(i).Item("DefPhil"))
+            GMDT.Rows(i).Item("OffPhil") = String.Format("'{0}'", MyOPhil)
+            GMDT.Rows(i).Item("DefPhil") = String.Format("'{0}'", MyDPhil)
+            GMDT.Rows(i).Item("DraftStrategy") = String.Format("'{0}'", DraftStrategy())
+            GMDT.Rows(i).Item("TeamBuilding") = String.Format("'{0}'", TeamBuilding())
+            PositionalImp(i, MyOPhil, MyDPhil)
             GMDT.Rows(i).Item("Risktaker") = MT.GetGaussian(49.5, 16.5)
             GMDT.Rows(i).Item("ValuesDraftPicks") = MT.GetGaussian(49.5, 16.5)
             GMDT.Rows(i).Item("FranchiseTag") = MT.GetGaussian(49.5, 16.5)
             GMDT.Rows(i).Item("ValuesCombine") = MT.GetGaussian(49.5, 16.5)
             GMDT.Rows(i).Item("ValuesCharacter") = MT.GetGaussian(49.5, 16.5)
             GMDT.Rows(i).Item("ValuesProduction") = MT.GetGaussian(49.5, 16.5)
-
         Next i
 
-        GetTables.UpdateTable(GMDT, "GMs")
+        SQLiteTables.BulkInsert(MyDB, GMDT, "GMs")
 
     End Sub
 

@@ -4,37 +4,45 @@ Public Class CollegePlayers
     Inherits Players
     Dim MyPlayer As New Players
     Dim SQLFieldNames As String
+    Dim MyPos As String
 
     Public Sub GenDraftPlayers(ByVal NumPlayers As Integer)
         SQLFieldNames = GetSQLFields("College")
-        GetTables.CreateTable(DraftDT, "DraftPlayers", SQLFieldNames)
-        GetTables.DeleteTable(DraftDT, "DraftPlayers")
-        GetTables.LoadTable(DraftDT, "DraftPlayers")
+        SQLiteTables.CreateTable(MyDB, DraftDT, "DraftPlayers", SQLFieldNames)
+        'SQLiteTables.DeleteTable(MyDB, DraftDT, "DraftPlayers")
+        SQLiteTables.LoadTable(MyDB, DraftDT, "DraftPlayers")
         DraftDT.Rows.Add(0)
 
         For i As Integer = 1 To NumPlayers
             DraftDT.Rows.Add(i)
-
-            DraftDT.Rows(i).Item("CollegePOS") = GetCollegePos()
-            GenNames(DraftDT, i, "CollegePlayer", DraftDT.Rows(i).Item("CollegePOS"))
-            GetDraftGrades(i, DraftDT.Rows(i).Item("CollegePos")) '#### TODO---> Convert from a sub to a function since it's returning a value
+            MyPos = GetCollegePos()
+            DraftDT.Rows(i).Item("CollegePOS") = String.Format("'{0}'", MyPos)
+            GenNames(DraftDT, i, "CollegePlayer", MyPos)
+            GetDraftGrades(i, MyPos) '#### TODO---> Convert from a sub to a function since it's returning a value
             'DraftDT.Rows(i).Item("ArmLength")=
             'DraftDT.Rows(i).Item("HandLength")=
-            DraftDT.Rows(i).Item("FortyYardTime") = Get40Time(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("TwentyYardTime") = Get20Time(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("TenYardTime") = Get10Time(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("ShortShuttle") = GetShortShuttle(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("BroadJump") = GetBroadJump(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("VertJump") = GetVertJump(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("ThreeConeDrill") = Get3Cone(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("BenchPress") = GetBenchPress(DraftDT.Rows(i).Item("CollegePOS"))
+            DraftDT.Rows(i).Item("FortyYardTime") = Get40Time(MyPos)
+            DraftDT.Rows(i).Item("TwentyYardTime") = Get20Time(MyPos)
+            DraftDT.Rows(i).Item("TenYardTime") = Get10Time(MyPos)
+            DraftDT.Rows(i).Item("ShortShuttle") = GetShortShuttle(MyPos)
+            DraftDT.Rows(i).Item("BroadJump") = GetBroadJump(MyPos)
+            DraftDT.Rows(i).Item("VertJump") = GetVertJump(MyPos)
+            DraftDT.Rows(i).Item("ThreeConeDrill") = Get3Cone(MyPos)
+            DraftDT.Rows(i).Item("BenchPress") = GetBenchPress(MyPos)
             DraftDT.Rows(i).Item("InterviewSkills") = CInt(MT.GetGaussian(49.5, 16.5))
-            DraftDT.Rows(i).Item("WonderlicTest") = GetWonderlic(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("SkillsTranslateToNFL") = GetSkillsTranslate(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("ProjNFLPos") = GetNFLPos(DraftDT.Rows(i).Item("CollegePOS"))
-            DraftDT.Rows(i).Item("PlaybookKnowledge") = MT.GetGaussian(49.5, 16.5)
+            DraftDT.Rows(i).Item("WonderlicTest") = GetWonderlic(MyPos)
+            DraftDT.Rows(i).Item("SkillsTranslateToNFL") = GetSkillsTranslate(MyPos)
+            DraftDT.Rows(i).Item("ProjNFLPos") = GetNFLPos(String.Format("'{0}'", MyPos))
         Next i
-        GetTables.UpdateTable(DraftDT, "DraftPlayers")
+        For row As Integer = 0 To DraftDT.Rows.Count - 1
+            For col As Integer = 0 To DraftDT.Columns.Count - 1
+                If DraftDT.Rows(row).Item(col) Is DBNull.Value Then
+                    DraftDT.Rows(row).Item(col) = 0
+                End If
+            Next col
+        Next row
+
+        SQLiteTables.BulkInsert(MyDB, DraftDT, "DraftPlayers") 'Inserts into DB
     End Sub
 
     ''' <summary>
@@ -928,7 +936,7 @@ Public Class CollegePlayers
                         DraftDT.Rows(Num).Item("RBPowerAbility") = Math.Round(MT.GetGaussian(6.5, 0.5), 1)
                         DraftDT.Rows(Num).Item("RBRunBlocking") = Math.Round(MT.GetGaussian(6.5, 0.4166673), 1)
                         DraftDT.Rows(Num).Item("RBRouteRunning") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                        DraftDT.Rows(Num).Item("RBRunningStyle") = "NONE"
+                        DraftDT.Rows(Num).Item("RBRunningStyle") = "'NONE'"
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(6, 0.5), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(6, 0.5), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(6, 0.5), 1)
@@ -941,7 +949,7 @@ Public Class CollegePlayers
                         DraftDT.Rows(Num).Item("RBPowerAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("RBRunBlocking") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("RBRouteRunning") = Math.Round(MT.GetGaussian(5, 0.583333), 1)
-                        DraftDT.Rows(Num).Item("RBRunningStyle") = "NONE"
+                        DraftDT.Rows(Num).Item("RBRunningStyle") = "'NONE'"
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -954,7 +962,7 @@ Public Class CollegePlayers
                         DraftDT.Rows(Num).Item("RBPowerAbility") = Math.Round(MT.GetGaussian(5.75, 0.416667), 1)
                         DraftDT.Rows(Num).Item("RBRunBlocking") = Math.Round(MT.GetGaussian(6, 0.416667), 1)
                         DraftDT.Rows(Num).Item("RBRouteRunning") = Math.Round(MT.GetGaussian(5, 0.583333), 1)
-                        DraftDT.Rows(Num).Item("RBRunningStyle") = "NONE"
+                        DraftDT.Rows(Num).Item("RBRunningStyle") = "'NONE'"
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(5.75, 0.416667), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(5.75, 0.416667), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(5.75, 0.416667), 1)
@@ -967,7 +975,7 @@ Public Class CollegePlayers
                         DraftDT.Rows(Num).Item("RBPowerAbility") = Math.Round(MT.GetGaussian(5.5, 0.416667), 1)
                         DraftDT.Rows(Num).Item("RBRouteRunning") = Math.Round(MT.GetGaussian(5, 0.583333), 1)
                         DraftDT.Rows(Num).Item("RBRunBlocking") = Math.Round(MT.GetGaussian(5.5, 0.583333), 1)
-                        DraftDT.Rows(Num).Item("RBRunningStyle") = "NONE"
+                        DraftDT.Rows(Num).Item("RBRunningStyle") = "'NONE'"
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(5.5, 0.33333), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(5.5, 0.33333), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(5.5, 0.33333), 1)
@@ -980,7 +988,7 @@ Public Class CollegePlayers
                         DraftDT.Rows(Num).Item("RBPowerAbility") = Math.Round(MT.GetGaussian(5, 0.583333), 1)
                         DraftDT.Rows(Num).Item("RBRouteRunning") = Math.Round(MT.GetGaussian(5, 0.583333), 1)
                         DraftDT.Rows(Num).Item("RBRunBlocking") = Math.Round(MT.GetGaussian(5, 0.583333), 1)
-                        DraftDT.Rows(Num).Item("RBRunningStyle") = "NONE"
+                        DraftDT.Rows(Num).Item("RBRunningStyle") = "'NONE'"
                         DraftDT.Rows(Num).Item("Athleticism") = Math.Round(MT.GetGaussian(5, 0.33333), 1)
                         DraftDT.Rows(Num).Item("QAB") = Math.Round(MT.GetGaussian(5, 0.33333), 1)
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(5, 0.33333), 1)
@@ -992,7 +1000,7 @@ Public Class CollegePlayers
                 DraftDT.Rows(Num).Item("RBDurability") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("RBPowerAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("RBRouteRunning") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                DraftDT.Rows(Num).Item("RBRunningStyle") = "NONE"
+                DraftDT.Rows(Num).Item("RBRunningStyle") = "'NONE'"
                 DraftDT.Rows(Num).Item("RBPassBlocking") = Math.Round(MT.GetGaussian(5, 0.583333), 1)
                 Select Case Grade
                     Case Is > 7.49
@@ -1326,13 +1334,13 @@ Public Class CollegePlayers
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                 End Select
             Case "DL", "DE"
-                DraftDT.Rows(Num).Item("DLStyle") = "NONE"
+                DraftDT.Rows(Num).Item("DLStyle") = "'NONE'"
                 DraftDT.Rows(Num).Item("DLRunAtHim") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("DLTackling") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("DLAgainstTrapAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("DLSlideAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("DLRunPursuit") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                DraftDT.Rows(Num).Item("DLPassRushTechnique") = "NONE"
+                DraftDT.Rows(Num).Item("DLPassRushTechnique") = "'NONE'"
                 DraftDT.Rows(Num).Item("DLHandUse") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("DLShedVsRunAway") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("DLTackleVsRunAway") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -1429,7 +1437,7 @@ Public Class CollegePlayers
                 DraftDT.Rows(Num).Item("LBCoverage") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("LBHands") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("LBBlitz") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                DraftDT.Rows(Num).Item("LBPassRushType") = "NONE"
+                DraftDT.Rows(Num).Item("LBPassRushType") = "'NONE'"
                 DraftDT.Rows(Num).Item("LBFillGaps") = Math.Round(MT.GetGaussian(6.0, 0.66667), 1)
                 DraftDT.Rows(Num).Item("LBContain") = Math.Round(MT.GetGaussian(6.0, 0.66667), 1)
                 Select Case Grade
@@ -1702,11 +1710,11 @@ Public Class CollegePlayers
                         DraftDT.Rows(Num).Item("COD") = Math.Round(MT.GetGaussian(5, 0.66667), 1)
                 End Select
             Case "K"
-                DraftDT.Rows(Num).Item("KPlantRelationship") = "NONE"
-                DraftDT.Rows(Num).Item("KApproachAngle") = "NONE"
-                DraftDT.Rows(Num).Item("KBallFlight") = "NONE"
-                DraftDT.Rows(Num).Item("KSteppingPattern") = "NONE"
-                DraftDT.Rows(Num).Item("KKickingStyle") = "NONE"
+                DraftDT.Rows(Num).Item("KPlantRelationship") = "'NONE'"
+                DraftDT.Rows(Num).Item("KApproachAngle") = "'NONE'"
+                DraftDT.Rows(Num).Item("KBallFlight") = "'NONE'"
+                DraftDT.Rows(Num).Item("KSteppingPattern") = "'NONE'"
+                DraftDT.Rows(Num).Item("KKickingStyle") = "'NONE'"
                 DraftDT.Rows(Num).Item("KHandlingWind") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("KTackling") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("KRunAndPassAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -1770,7 +1778,7 @@ Public Class CollegePlayers
                 DraftDT.Rows(Num).Item("PFootSpeed") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("PApproachLine") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("PHandlingTime") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
-                DraftDT.Rows(Num).Item("PSteppingPattern") = "NONE"
+                DraftDT.Rows(Num).Item("PSteppingPattern") = "'NONE'"
                 DraftDT.Rows(Num).Item("PHands") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("PTackling") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
                 DraftDT.Rows(Num).Item("PRunAndPassAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
@@ -1848,6 +1856,7 @@ Public Class CollegePlayers
         DraftDT.Rows(Num).Item("FieldAwareness") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
         DraftDT.Rows(Num).Item("JumpingAbility") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
         DraftDT.Rows(Num).Item("Timing") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
+        DraftDT.Rows(Num).Item("PlaybookKnowledge") = Math.Round(MT.GetGaussian(6, 0.66667), 1)
     End Sub
     Public Function GetArmLength(ByVal Pos As String)
 

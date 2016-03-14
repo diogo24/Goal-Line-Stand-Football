@@ -7,12 +7,12 @@
     ''' </summary>
     ''' <param name="NumOwners"></param>
     Public Sub GenOwners(ByVal NumOwners As Integer)
-        Dim SQLFieldNames As String = "OwnerID int Not NULL, TeamID int Not NULL, FName varchar(20) Not NULL, LName varchar(20) Not NULL, College varchar(50) Not NULL, Age int Not NULL, DOB varchar(12) NOT NULL, 
-OwnerRep int Not NULL,  Experience int Not NULL, GMPatience int NOT NULL, CoachPatience int NOT NULL, Meddles int NOT NULL, WantsWinner int NOT NULL, SpendsMoney int NOT NULL CONSTRAINT Owner_ID PRIMARY KEY(OwnerID)"
+        Dim SQLFieldNames As String = "OwnerID int PRIMARY KEY NOT NULL, TeamID int NULL, FName varchar(20) NULL, LName varchar(20) NULL, College varchar(50) NULL, Age int NULL, DOB varchar(12) NULL, 
+OwnerRep int NULL,  Experience int NULL, GMPatience int NULL, CoachPatience int NULL, Meddles int NULL, WantsWinner int NULL, SpendsMoney int"
 
-        GetTables.CreateTable(OwnerDT, "Owners", SQLFieldNames) 'Inside CreateTable, it checks to see if a table exists or not.  If it does not, it creates one, if it does it exits.
-        GetTables.DeleteTable(OwnerDT, "Owners")
-        GetTables.LoadTable(OwnerDT, "Owners")
+        SQLiteTables.CreateTable(MyDB, OwnerDT, "Owners", SQLFieldNames) 'Inside CreateTable, it checks to see if a table exists or not.  If it does not, it creates one, if it does it exits.
+        SQLiteTables.DeleteTable(MyDB, OwnerDT, "Owners") 'removes all records if there were any
+        SQLiteTables.LoadTable(MyDB, OwnerDT, "Owners")
         OwnerDT.Rows.Add(0)
         For i As Integer = 1 To NumOwners
             OwnerDT.Rows.Add(i)
@@ -30,7 +30,7 @@ OwnerRep int Not NULL,  Experience int Not NULL, GMPatience int NOT NULL, CoachP
             OwnerDT.Rows(i).Item("SpendsMoney") = MT.GetGaussian(49.5, 16.5)
 
         Next i
-        GetTables.UpdateTable(OwnerDT, "Owners")
+        SQLiteTables.BulkInsert(MyDB, OwnerDT, "Owners")
     End Sub
 
 End Class

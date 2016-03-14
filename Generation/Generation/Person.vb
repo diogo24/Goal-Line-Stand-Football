@@ -2,8 +2,8 @@
 Imports System.Text.RegularExpressions
 Imports Microsoft.VisualBasic.Strings
 Imports System.String
+Imports SQLFunctions.SQLiteDataFunctions
 Public Class Person
-
     ''' <summary>
     ''' Calls the Sub PutDataInDT to load all data in the tables
     ''' </summary>
@@ -20,59 +20,93 @@ Public Class Person
     ''' <param name="file"></param>
     Private Sub PutDataInDT(ByVal DT As DataTable, ByVal file As StreamReader)
 
-        Dim Line As String = file.ReadLine()
-        Dim StringArray As String() = Line.Split(","c)
+        Dim StringArray As String() = file.ReadLine().Split(","c)
         Dim Row As DataRow
+        Dim line As String
 
         For Each s As String In StringArray
             DT.Columns.Add(New DataColumn())
         Next
 
+        Row = DT.NewRow() 'adds in the initial line, or this was getting skipped previously
+        Row.ItemArray = StringArray
+        DT.Rows.Add(Row)
+
         Using file
             While Not file.EndOfStream
                 Line = file.ReadLine
                 Row = DT.NewRow()
-                Row.ItemArray = Line.Split(","c)
-                DT.Rows.Add(Row)
+                Try
+                    Row.ItemArray = Line.Split(","c)
+                    DT.Rows.Add(Row)
+                Catch ex As System.ArgumentException
+                    Console.WriteLine(ex.Message)
+                End Try
+
             End While
         End Using
-        'file.Close()
-
     End Sub
-    Private Function GetItem(ByVal Item As DataTable, ByVal OutputTo As DataTable) As String
+    Private Function GetItem(ByVal MyItem As DataTable, ByVal OutputTo As DataTable) As String
+        Dim count As Integer = MyItem.Rows.Count - 1
 
-        Dim Min As Double = 0
-        Dim Max As Double = Item.Rows(Item.Rows.Count - 1).Item(2) 'gets the last frequency value
-        Dim result As Double = Math.Round(MT.GenerateDouble(Min, Max), 3)
+        Dim MinName As Double = 0
+        Dim MaxName As Double = MyItem.Rows(count).Item(2) 'gets the last frequency value
+        Dim MinCol As Integer = 0
+        Dim MaxCol As Integer = MyItem.Rows(count).Item(2)
+        Dim ResName As Double = Math.Round(MT.GenerateDouble(MinName, MaxName), 3)
+        Dim ResCol As Integer = MT.GenerateInt32(MinCol, MaxCol)
+        Dim SupName As String
+        Dim RowMin As Double
+        Dim RowMax As Double
 
-        For row As Integer = 0 To Item.Rows.Count - 1 'cycles through the rows until it finds the appropriate row
-            Min = Item.Rows(row).Item(1)
-            Max = Item.Rows(row).Item(2)
-
-            If result >= Min And result <= Max Then 'return name in Proper Case instead of All Caps
-                'Console.WriteLine(StrConv(Item.Rows(row).Item(0).ToString, VbStrConv.ProperCase) & result)
-                If Item.Rows.Count < 300 Then 'return colleges normally because they are capitalized many times(USC, UCLA, etc...)
-                    Return Item.Rows(row).Item(0).ToString
-                Else
-                    Return StrConv(Item.Rows(row).Item(0).ToString, VbStrConv.ProperCase)
-                End If
-                Exit For
-            End If
+        'Console.WriteLine(ResName & "   " & ResCol)
+        For row As Integer = 0 To MyItem.Rows.Count - 1 'cycles through the rows until it finds the appropriate row
+            RowMin = MyItem.Rows(row).Item(1)
+            RowMax = MyItem.Rows(row).Item(2)
+            Select Case MyItem.Rows.Count - 1 'for some reason DataTable info is all NULL
+                Case < 300 'choose college format
+                    If ResCol >= RowMin And ResCol <= RowMax Then
+                        SupName = MyItem.Rows(row).Item(0).ToString
+                        'Console.WriteLine("Min: {0} Max: {1} Result: {2} Supposed to be Name: {3}", RowMin, RowMax, ResCol, SupName)
+                        Return MyItem.Rows(row).Item(0).ToString 'return colleges normally because they are capitalized many times(USC, UCLA, etc...)
+                        Exit For
+                    End If
+                Case Else
+                    If ResName >= RowMin And ResName <= RowMax Then 'return name in Proper Case instead of All Caps
+                        SupName = StrConv(MyItem.Rows(row).Item(0).ToString, VbStrConv.ProperCase)
+                        'Console.WriteLine("Min: {0} Max: {1} Result: {2} Supposed to be Name: {3}", RowMin, RowMax, ResName, SupName)
+                        Return StrConv(MyItem.Rows(row).Item(0).ToString, VbStrConv.ProperCase)
+                        Exit For
+                    End If
+            End Select
         Next row
+        'Console.WriteLine("Min: {0} Max: {1} Result: {2} Supposed to be Name: {3}", RowMin, RowMax, ResName, SupName)
+        ' Console.WriteLine("Min: {0} Max: {1} Result: {2} Supposed to be Name: {3}", RowMin, RowMax, ResCol, SupName)
     End Function
     ''' <summary>
-    ''' Generates all the Data a "Person" would have 
+    ''' Generates all the Data a "Person" would have
+    ''' For some reason names and colleges will return nothing at times, trying to track down the source of this...have it regenerating a value when this
+    ''' happens currently.
     ''' </summary>
     ''' <param name="DTOutputTo"></param>
     ''' <param name="Row"></param>
     ''' <param name="PersonType"></param>
     ''' <param name="Position"></param>
     Public Sub GenNames(ByVal DTOutputTo As DataTable, ByVal Row As Integer, ByVal PersonType As String, Optional ByVal Position As String = "")
-        DTOutputTo.Rows(Row).Item("FName") = GetItem(FirstNames, DTOutputTo)
-        DTOutputTo.Rows(Row).Item("LName") = GetItem(LastNames, DTOutputTo)
-        DTOutputTo.Rows(Row).Item("College") = GetItem(Colleges, DTOutputTo)
-        DTOutputTo.Rows(Row).Item("Age") = GenAge(PersonType, Position)
-        DTOutputTo.Rows(Row).Item("DOB") = GetDOB(DTOutputTo.Rows(Row).Item("Age"))
+
+        'While DTOutputTo.Rows(Row).Item("FName") = DBNull.Value Or DTOutputTo.Rows(Row).Item("FName") = "''" Or DTOutputTo.Rows(Row).Item("LName") = DBNull.Value Or
+        'DTOutputTo.Rows(Row).Item("LName") = "''" Or DTOutputTo.Rows(Row).Item("Colleges") = DBNull.Value Or DTOutputTo.Rows(Row).Item("Colleges") = "''"
+        Try
+                DTOutputTo.Rows(Row).Item("FName") = String.Format("'{0}'", GetItem(FirstNames, DTOutputTo)) 'adds the necessary ' ' modifier to strings for SQLite
+                DTOutputTo.Rows(Row).Item("LName") = String.Format("'{0}'", GetItem(LastNames, DTOutputTo))
+                DTOutputTo.Rows(Row).Item("College") = String.Format("'{0}'", GetItem(Colleges, DTOutputTo))
+                DTOutputTo.Rows(Row).Item("Age") = GenAge(PersonType, Position)
+                DTOutputTo.Rows(Row).Item("DOB") = String.Format("'{0}", GetDOB(DTOutputTo.Rows(Row).Item("Age")))
+            Catch ex As System.InvalidCastException
+                Console.WriteLine(ex.Message)
+                Console.WriteLine(ex.Data)
+            End Try
+        'End While
 
         If Position <> "" Then 'only generates this data if they are a player as its not relevant to the other people
             DTOutputTo.Rows(Row).Item("Height") = GetHeight(Position)
@@ -88,7 +122,6 @@ Public Class Person
         Dim Day As Integer
         Dim Month As Integer
         Dim Year As Integer
-        'Dim TestDate As Date
 
         Month = MT.GenerateInt32(1, 12)
 
@@ -102,10 +135,9 @@ Public Class Person
         End Select
 
         Year = Date.Today.Year - Age
-        Dim DOB As String = "" & Month & "/" & Day & "/" & Year & ""
-        Return DOB
-        'TestDate = Convert.ToDateTime("" & Month & "/" & Day & "/" & Year).Date
-        'Return Convert.ToDateTime("" & Month & "/" & Day & "/" & Year).ToShortDateString
+
+        Return String.Format("{0}/{1}/{2}'", Month, Day, Year) 'creates the proper format for SQLite ' ' around string
+
     End Function
     ''' <summary>
     ''' Generates the player age based on Person Type and in the case of NFL Player, by Position

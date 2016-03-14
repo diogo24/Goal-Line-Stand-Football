@@ -31,6 +31,11 @@ Generation
  <param name="Pos"></param>
  <returns></returns>
 </member>
+<member name="T:Generation.FilesAndDataTables">
+ <summary>
+ Holds any Public variables for use within the Generation project
+ </summary>
+</member>
 <member name="T:Generation.GeneralManager">
  <summary>
  Creates the GM's as requested by the number supplied.  32 GM's will randomly be placed on a team
@@ -81,7 +86,9 @@ Generation
 </member>
 <member name="M:Generation.Person.GenNames(System.Data.DataTable,System.Int32,System.String,System.String)">
  <summary>
- Generates all the Data a "Person" would have 
+ Generates all the Data a "Person" would have
+ For some reason names and colleges will return nothing at times, trying to track down the source of this...have it regenerating a value when this
+ happens currently.
  </summary>
  <param name="DTOutputTo"></param>
  <param name="Row"></param>

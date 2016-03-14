@@ -8,11 +8,11 @@
 
 
         If DraftDT.Rows.Count = 0 Then
-            GetTables.LoadTable(DraftDT, "DraftPlayers")
+            SQLiteTables.LoadTable(MyDB, DraftDT, "DraftPlayers")
         End If
 
         If ScoutDT.Rows.Count = 0 Then
-            GetTables.LoadTable(ScoutDT, "Scouts")
+            SQLiteTables.LoadTable(MyDB, ScoutDT, "Scouts")
         End If
 
         Dim ScoutRows As DataRowCollection = ScoutDT.Rows
@@ -26,7 +26,7 @@
             Next Scout
         Next Player
 
-        GetTables.UpdateTable(ScoutGradeDT, "ScoutsGrade")
+        SQLiteTables.BulkInsert(MyDB, ScoutGradeDT, "ScoutsGrade")
     End Sub
 
     'Private Sub GradePlayer(ByVal ScoutNum As Integer, ByVal PlayerNum As Integer)

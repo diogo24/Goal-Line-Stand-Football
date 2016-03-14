@@ -10,7 +10,8 @@
     <AssemblyName>Generation</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,10 +45,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mersenne">
-      <HintPath>..\..\Random\Random\bin\Debug\Mersenne.dll</HintPath>
+      <HintPath>..\..\Random\Random\obj\Debug\Mersenne.dll</HintPath>
     </Reference>
     <Reference Include="SQLFunctions">
-      <HintPath>..\..\SQLFunctions\SQLFunctions\bin\Debug\SQLFunctions.dll</HintPath>
+      <HintPath>..\..\SQLFunctions\SQLFunctions\obj\Debug\SQLFunctions.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -119,6 +120,16 @@
     <Content Include="Colleges.txt" />
     <Content Include="FName.txt" />
     <Content Include="LName.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NFLDraft\NFLDraft\NFLDraft.vbproj">
+      <Project>{f8f1ebd4-a579-4c44-9d3d-c50a968ab535}</Project>
+      <Name>NFLDraft</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NFLScheduler\NFLScheduler\NFLScheduler.vbproj">
+      <Project>{3a3ebcab-97d5-49d5-8592-e754b1379384}</Project>
+      <Name>NFLScheduler</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
