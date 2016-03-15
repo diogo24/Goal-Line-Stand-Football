@@ -3,7 +3,7 @@
 ''' Holds any Public variables for use within the Generation project
 ''' </summary>
 Public Module FilesAndDataTables
-    Public filePath As String = "../../../Generation/files/"
+    Public filePath As String = "files/"
     Public MT As New Mersenne.MersenneTwister
     Public CoachDT As New DataTable
     Public DraftDT As New DataTable

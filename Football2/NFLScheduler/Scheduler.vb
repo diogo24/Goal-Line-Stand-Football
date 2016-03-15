@@ -1,7 +1,7 @@
 ﻿'generates a schedule for the season using NFL rules
 Imports System.IO
 Public Class Scheduler
-    Public filePath As String = "../../../Generation/files/"
+    Public filePath As String = "files/"
     Dim HomeTeam As New Collection
     Dim AwayTeam As New Collection
     Dim HomeTeamCopy As New Collection

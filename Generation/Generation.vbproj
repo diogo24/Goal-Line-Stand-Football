@@ -110,9 +110,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="files\Colleges.txt" />
-    <Content Include="files\FName.txt" />
-    <Content Include="files\LName.txt" />
+    <Content Include="files\Colleges.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="files\FName.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="files\LName.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Football2\Mersenne\Mersenne.vbproj">
