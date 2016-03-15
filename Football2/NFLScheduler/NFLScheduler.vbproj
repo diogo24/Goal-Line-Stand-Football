@@ -100,9 +100,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Random\Random.vbproj">
-      <Project>{52288db0-33ac-4b6c-b443-619242f6e700}</Project>
-      <Name>Random</Name>
+    <ProjectReference Include="..\Mersenne\Mersenne.vbproj">
+      <Project>{a5d0da64-af55-4339-b01a-3c1d07c15d6a}</Project>
+      <Name>Mersenne</Name>
     </ProjectReference>
     <ProjectReference Include="..\SQLFunctions\SQLFunctions.vbproj">
       <Project>{7f431bbd-a0aa-495e-a8f1-edeb3234c627}</Project>

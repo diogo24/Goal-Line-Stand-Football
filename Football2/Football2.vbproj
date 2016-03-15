@@ -179,6 +179,10 @@
       <Project>{51365abf-43a9-4f72-b8e4-12f840c9bf9e}</Project>
       <Name>Generation</Name>
     </ProjectReference>
+    <ProjectReference Include="Mersenne\Mersenne.vbproj">
+      <Project>{a5d0da64-af55-4339-b01a-3c1d07c15d6a}</Project>
+      <Name>Mersenne</Name>
+    </ProjectReference>
     <ProjectReference Include="NFLDraft\NFLDraft.vbproj">
       <Project>{0186534f-c6d9-468e-95b8-67a93bd166bd}</Project>
       <Name>NFLDraft</Name>
@@ -186,10 +190,6 @@
     <ProjectReference Include="NFLScheduler\NFLScheduler.vbproj">
       <Project>{d4e191bd-9dd9-44a9-8339-57da40ca82b9}</Project>
       <Name>NFLScheduler</Name>
-    </ProjectReference>
-    <ProjectReference Include="Random\Random.vbproj">
-      <Project>{52288db0-33ac-4b6c-b443-619242f6e700}</Project>
-      <Name>Random</Name>
     </ProjectReference>
     <ProjectReference Include="SQLFunctions\SQLFunctions.vbproj">
       <Project>{7f431bbd-a0aa-495e-a8f1-edeb3234c627}</Project>
