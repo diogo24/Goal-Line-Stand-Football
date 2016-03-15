@@ -68,6 +68,24 @@ Public Class SQLiteDataFunctions
             End Using
         End Using
     End Sub
+
+    ''' <summary>
+    ''' This will Keep the Actual Table, but simply Delete all the records in it
+    ''' </summary>
+    ''' <param name="DBName"></param>
+    ''' <param name="DT"></param>
+    ''' <param name="TableName"></param>
+    Public Sub DeleteTable(ByVal DBName As String, ByVal TableName As String)
+        GetConnectionString(DBName)
+        Using Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection(String.Format(ConnectionStringFormat, DBName))
+            Conn.Open()
+            Dim SQL As String = "DELETE FROM " & TableName
+            Using Conn
+                Dim cmd As New SQLite.SQLiteCommand(SQL, Conn)
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+    End Sub
     ''' <summary>
     ''' This completely removes the Table from the Database
     ''' </summary>

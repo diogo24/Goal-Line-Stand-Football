@@ -42,6 +42,7 @@ Public Class CollegePlayers
             Next col
         Next row
 
+        SQLiteTables.DeleteTable(MyDB, "DraftPlayers")
         SQLiteTables.BulkInsert(MyDB, DraftDT, "DraftPlayers") 'Inserts into DB
     End Sub
 
