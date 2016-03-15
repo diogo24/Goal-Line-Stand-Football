@@ -9,8 +9,8 @@ Public Class Form1
         Randomize()
         'Dim SQLFieldNames = "Number varchar(5), Flt varchar(5), Name varchar(5)"
         Try
-            CollegePlayer.GenDraftPlayers(3000)
-            NFLScout.GenScouts(800)
+            'CollegePlayer.GenDraftPlayers(3000)
+            'NFLScout.GenScouts(800)
             NFLOwner.GenOwners(100)
             NFLGM.GenGMs(100)
             NFLCoach.GenCoaches(800)

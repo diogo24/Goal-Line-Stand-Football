@@ -1,6 +1,7 @@
 ﻿'generates a schedule for the season using NFL rules
 Imports System.IO
 Public Class Scheduler
+    Public filePath As String = "../../../Generation/files/"
     Dim HomeTeam As New Collection
     Dim AwayTeam As New Collection
     Dim HomeTeamCopy As New Collection
@@ -43,7 +44,7 @@ Public Class Scheduler
     Public Sub GetSchedule(ByVal NumGames As Integer)
         If DoOnce = False Then 'first time through the scheduler
 
-            SW = New StreamWriter("Schedule.txt")
+            SW = New StreamWriter(filePath + "Schedule.txt")
 
             Dim SQLString As String = "TeamID int Not NULL, DivID int NOT NULL, ConfID int NOT NULL, TeamFName varchar(20) NOT NULL, TeamLName varchar(20) NOT NULL, LastYearFinish int NOT NULL, DivOutConfID int NOT NULL, DivInConfID int NOT NULL, LYFinishHGSched int NOT NULL, TeamNick char(10) NOT NULL CONSTRAINT Team_ID PRIMARY KEY(TeamID)"
             GetTables.CreateTable(CityInfo, "CityInfo", SQLString)
@@ -586,7 +587,7 @@ Public Class Scheduler
             '  Console.WriteLine(i & " at " & InitTeams(i).AwayGames(game))
             'Next game
         Next i
-                DoOnce2 = True
+        DoOnce2 = True
 
 
         While games < (16 - (NumByeTeams / 2)) 'schedules this wekeks games ###Might want to change this to a While Loop---While games <> (16-(NumByeTeams/2))
@@ -1013,7 +1014,7 @@ Public Class Scheduler
 
         Dim MyTeams As New List(Of Integer)
         MyTeams.Clear()
-        Myteams.Add(Team1)
+        MyTeams.Add(Team1)
         MyTeams.Add(Team2)
         MyTeams.Add(Team3)
         MyTeams.Add(Team4)

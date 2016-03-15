@@ -110,9 +110,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Colleges.txt" />
-    <Content Include="FName.txt" />
-    <Content Include="LName.txt" />
+    <Content Include="files\Colleges.txt" />
+    <Content Include="files\FName.txt" />
+    <Content Include="files\LName.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Football2\Mersenne\Mersenne.vbproj">
