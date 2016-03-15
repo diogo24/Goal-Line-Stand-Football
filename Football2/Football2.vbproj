@@ -174,28 +174,6 @@
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Generation\Generation\Generation.vbproj">
-      <Project>{daea933c-6441-46a4-9f89-b012bae9a27a}</Project>
-      <Name>Generation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NFLDraft\NFLDraft\NFLDraft.vbproj">
-      <Project>{f8f1ebd4-a579-4c44-9d3d-c50a968ab535}</Project>
-      <Name>NFLDraft</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NFLScheduler\NFLScheduler\NFLScheduler.vbproj">
-      <Project>{3a3ebcab-97d5-49d5-8592-e754b1379384}</Project>
-      <Name>NFLScheduler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Random\Random\Mersenne.vbproj">
-      <Project>{9fcefa45-842d-4c59-a1fd-35fd5e1bc55f}</Project>
-      <Name>Mersenne</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SQLFunctions\SQLFunctions\SQLFunctions.vbproj">
-      <Project>{5a4a94c5-fc1d-4301-a83f-810d1961f4ba}</Project>
-      <Name>SQLFunctions</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
