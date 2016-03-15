@@ -2,34 +2,39 @@
 Imports System.Collections
 Imports System.Text
 Public Class SQLiteDataFunctions
-    Dim Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection()
+    'Dim Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection()
+    Dim ConnectionStringFormat As String = "Data Source=|DataDirectory|\{0}.sqlite;Version=3"
     ''' <summary>
     ''' Opens a connection to this DB--Must Explicitly pass the connection string before returning it, otherwise it will throw a Null exception as the connection string will be Nothing.
     ''' </summary>
     ''' <param name="DBName"></param>
     ''' <returns></returns>
     Public Function GetConnectionString(ByVal DBName As String) As String
-        If Conn.State <> ConnectionState.Open Then
-            Conn.ConnectionString = "Data Source=|DataDirectory|\" & DBName & ".sqlite;Version=3"
-            Return Conn.ConnectionString '= "Data Source=|DataDirectory|\" & DBName & ".sqlite;Version=3"
-            Conn.Open()
-        Else
-            Conn.ConnectionString = "Data Source=|DataDirectory|\" & DBName & ".sqlite;Version=3"
-        End If
-
+        Using Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection()
+            If Conn.State <> ConnectionState.Open Then
+                Conn.ConnectionString = "Data Source=|DataDirectory|\" & DBName & ".sqlite;Version=3"
+                Return Conn.ConnectionString '= "Data Source=|DataDirectory|\" & DBName & ".sqlite;Version=3"
+                Conn.Open()
+            Else
+                Conn.ConnectionString = "Data Source=|DataDirectory|\" & DBName & ".sqlite;Version=3"
+            End If
+        End Using
     End Function
     ''' <summary>
     ''' check to see if the table exists, if not then create one
     ''' </summary>
     ''' <param name="DBName"></param>
     Public Sub CreateTable(ByVal DBName As String, ByVal DT As DataTable, ByVal TableName As String, ByVal SQLFieldNames As String)
+
         GetConnectionString(DBName)
-        Conn.Open()
-        'Checks to see if the Table exists, if not create the table
-        Dim SQL As String = ("CREATE TABLE If Not EXISTS " & TableName & "(" & SQLFieldNames & ")")
-        Dim SQLCmd As SQLiteCommand = New SQLiteCommand(SQL, Conn)
-        SQLCmd.ExecuteNonQuery()
-        Conn.Close()
+        Using Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection(String.Format(ConnectionStringFormat, DBName))
+            Conn.Open()
+            'Checks to see if the Table exists, if not create the table
+            Dim SQL As String = ("CREATE TABLE If Not EXISTS " & TableName & "(" & SQLFieldNames & ")")
+            Dim SQLCmd As SQLiteCommand = New SQLiteCommand(SQL, Conn)
+            SQLCmd.ExecuteNonQuery()
+            Conn.Close()
+        End Using
     End Sub
     ''' <summary>
     ''' Loads a Table from the DB.  If the table does not exist, it creates one
@@ -38,12 +43,13 @@ Public Class SQLiteDataFunctions
     ''' <param name="TableName"></param>
     Public Sub LoadTable(ByVal DBName As String, ByVal DT As DataTable, ByVal TableName As String)
         GetConnectionString(DBName)
-
-        Dim SQLCmd As SQLite.SQLiteCommand = New SQLite.SQLiteCommand("Select * From " & TableName)
-        Dim DA As SQLite.SQLiteDataAdapter = New SQLiteDataAdapter(SQLCmd)
-        DA.SelectCommand.Connection = Conn
-        DA.Fill(DT)
-        Conn.Close()
+        Using Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection(String.Format(ConnectionStringFormat, DBName))
+            Dim SQLCmd As SQLite.SQLiteCommand = New SQLite.SQLiteCommand("Select * From " & TableName)
+            Dim DA As SQLite.SQLiteDataAdapter = New SQLiteDataAdapter(SQLCmd)
+            DA.SelectCommand.Connection = Conn
+            DA.Fill(DT)
+            Conn.Close()
+        End Using
     End Sub
     ''' <summary>
     ''' This will Keep the Actual Table, but simply Delete all the records in it
@@ -53,11 +59,13 @@ Public Class SQLiteDataFunctions
     ''' <param name="TableName"></param>
     Public Sub DeleteTable(ByVal DBName As String, ByVal DT As DataTable, ByVal TableName As String)
         GetConnectionString(DBName)
-        Conn.Open()
-        Dim SQL As String = "DELETE FROM " & TableName
-        Using Conn
-            Dim cmd As New SQLite.SQLiteCommand(SQL, Conn)
-            cmd.ExecuteNonQuery()
+        Using Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection(String.Format(ConnectionStringFormat, DBName))
+            Conn.Open()
+            Dim SQL As String = "DELETE FROM " & TableName
+            Using Conn
+                Dim cmd As New SQLite.SQLiteCommand(SQL, Conn)
+                cmd.ExecuteNonQuery()
+            End Using
         End Using
     End Sub
     ''' <summary>
@@ -68,11 +76,13 @@ Public Class SQLiteDataFunctions
     ''' <param name="TableName"></param>
     Public Sub DropTable(ByVal DBName As String, ByVal DT As DataTable, ByVal TableName As String)
         GetConnectionString(DBName)
-        Conn.Open()
-        Dim SQL As String = "DROP TABLE " & TableName
-        Using Conn
-            Dim cmd As New SQLite.SQLiteCommand(SQL, Conn)
-            cmd.ExecuteNonQuery()
+        Using Conn As SQLite.SQLiteConnection = New SQLite.SQLiteConnection(String.Format(ConnectionStringFormat, DBName))
+            Conn.Open()
+            Dim SQL As String = "DROP TABLE " & TableName
+            Using Conn
+                Dim cmd As New SQLite.SQLiteCommand(SQL, Conn)
+                cmd.ExecuteNonQuery()
+            End Using
         End Using
     End Sub
     ''' <summary>
