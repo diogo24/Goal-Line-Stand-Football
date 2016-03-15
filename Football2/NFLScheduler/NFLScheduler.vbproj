@@ -99,6 +99,16 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Random\Random.vbproj">
+      <Project>{52288db0-33ac-4b6c-b443-619242f6e700}</Project>
+      <Name>Random</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SQLFunctions\SQLFunctions.vbproj">
+      <Project>{7f431bbd-a0aa-495e-a8f1-edeb3234c627}</Project>
+      <Name>SQLFunctions</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
